@@ -10,24 +10,24 @@ from utils import create_fits
 from utils import flatten_images
 
 
-def generate_fringe(image):
+def generate_fringe_map(image):
     """ Create a fringe image from a science image."""
     median = np.median(image)
     median_absdev = np.median(np.abs(image - median))
     pixel_5sigma_plus = median + (median_absdev * 1.48 * 5)
     pixel_5sigma_minus = median - (median_absdev * 1.48 * 5)
 
-    fringe = np.zeros_like(image)
-    fringe[:] = image[:]
-    cond1 = fringe >= pixel_5sigma_plus
-    cond2 = fringe <= pixel_5sigma_minus
+    fringe_map = np.zeros_like(image)
+    fringe_map[:] = image[:]
+    cond1 = fringe_map >= pixel_5sigma_plus
+    cond2 = fringe_map <= pixel_5sigma_minus
     cond = cond1 + cond2
-    fringe[cond] = median
+    fringe_map[cond] = median
 
-    fringe -= median
-    fringe /= median_absdev
+    fringe_map -= median
+    fringe_map /= median_absdev
 
-    return fringe, median_absdev
+    return fringe_map, median_absdev
 
 
 def gather_flat_fringes():
@@ -60,7 +60,7 @@ def gather_fringes():
             print('Generating fringe image %i/%i' % (i, len(fname_arr)))
         with fits.open(fname) as f:
             image = f[0].data
-        fringe, _ = generate_fringe(image)
+        fringe, _ = generate_fringe_map(image)
 
         if i == 0:
             image_shape = fringe.shape
@@ -86,9 +86,9 @@ def append_eigenvalues_to_header(header, fringe_ica):
 def remove_fringe(image_name,
                   fringe_model_name,
                   debugFlag=False):
-    """ Generates fringe model image for the provided science image and
-    and subtracts that fringe model image from the science image, resulting in
-    a sciimg.clean.fits file ready for science.
+    """ Generates fringe bias image for the provided science image and
+    and subtracts that fringe bias image from the science image, resulting in
+    a clean image with extension *sciimg.clean.fits.
 
     Models are loaded from disk as
     fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
@@ -108,30 +108,30 @@ def remove_fringe(image_name,
         header = f[0].header
         image_shape = image.shape
 
-    fringe, median_absdev = generate_fringe(image)
+    fringe_map, median_absdev = generate_fringe_map(image)
 
     estimator = joblib.load(fringe_model_name)
 
-    fringe = fringe.flatten()
-    fringe_transposed = fringe.reshape(1, len(fringe))
-    fringe_ica = estimator.transform(fringe_transposed)
+    fringe_map = fringe_map.flatten()
+    fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))
+    fringe_ica = estimator.transform(fringe_map_transposed)
 
-    fringe_model = estimator.inverse_transform(fringe_ica)
-    fringe_model = fringe_model.reshape(image_shape)
+    fringe_bias = estimator.inverse_transform(fringe_ica)
+    fringe_bias = fringe_bias.reshape(image_shape)
 
-    fringe_model *= median_absdev
+    fringe_bias *= median_absdev
 
     header = append_eigenvalues_to_header(header, fringe_ica)
 
-    image_clean = image - fringe_model
+    image_clean = image - fringe_bias
     image_clean_fname = image_name.replace('.fits', '.clean.fits')
     create_fits(image_clean_fname, image_clean, header)
     print('-- %s saved to disk' % image_clean_fname)
 
     if debugFlag:
         extension = os.path.basename(fringe_model_name).replace('.model',
-                                                                '')
+                                                                '.bias')
         fname = image_name.replace('.fits', '.%s.fits' % extension)
-        create_fits(fname, fringe_model, header)
+        create_fits(fname, fringe_bias, header)
 
         print('-- %s saved to disk' % fname)

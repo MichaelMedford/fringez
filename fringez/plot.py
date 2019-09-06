@@ -32,29 +32,29 @@ def plot_gallery(title, images, image_shape):
     plt.close()
 
 
-def plot_before_and_after(title, image, image_model):
-    """Plots the difference between an image and its model."""
+def plot_before_and_after(title, fringe_map, fringe_bias):
+    """Plots the difference between a fringe map the estimators fringe bias."""
 
-    vmax = max(image.max(), -image.min())
-    residual = image - image_model
+    vmax = max(fringe_map.max(), -fringe_map.min())
+    residual = fringe_map - fringe_bias
 
     fig, ax = plt.subplots(2, 2, figsize=(8, 6))
     ax = ax.flatten()
 
     fig.suptitle(title, size=10)
-    ax[0].imshow(image,
+    ax[0].imshow(fringe_map,
                  cmap='gray',
                  interpolation='None',
                  vmin=-vmax, vmax=vmax,
                  origin='lower')
-    ax[0].set_title('Fringe Original')
+    ax[0].set_title('Fringe Map')
 
-    ax[1].imshow(image_model,
+    ax[1].imshow(fringe_bias,
                  cmap='gray',
                  interpolation='None',
                  vmin=-vmax, vmax=vmax,
                  origin='lower')
-    ax[1].set_title('Fringe Model')
+    ax[1].set_title('Fringe Bias')
 
     ax[2].imshow(residual,
                  cmap='gray',
@@ -63,10 +63,10 @@ def plot_before_and_after(title, image, image_model):
                  origin='lower')
     ax[2].set_title('Residual')
 
-    std_image = float(np.std(image))
+    std_image = float(np.std(fringe_map))
     std_residual = float(np.std(residual))
     bins = np.linspace(-std_image, std_image, 200)
-    ax[3].hist(image.flatten(), bins=bins,
+    ax[3].hist(fringe_map.flatten(), bins=bins,
                color='g', alpha=0.3,
                label='Original +- %.2f' % std_image)
     ax[3].hist(residual.flatten(), bins=bins,

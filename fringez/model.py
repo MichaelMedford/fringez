@@ -53,45 +53,37 @@ def return_estimator_names():
 
 
 def generate_models(fname_arr,
-                    fringes_flattened,
+                    fringe_maps_flattened,
                     image_shape,
                     rcid,
                     fringe_model_name=None,
                     n_components=6,
-                    plotFlag=False,
-                    curdirFlag=False):
+                    plotFlag=False):
     """Generates fringe models by applying an estimator method to a collection
-    of fringe images.
+    of fringe maps.
 
     Models are saved to disk as
-    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model in the
-    ztf-fringe-model/models folder."""
+    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model
+    """
 
     estimators = return_estimators(n_components=n_components)
 
     for name, estimator in estimators:
         timestamp = datetime.datetime.now().strftime('%Y%m%d')
-        if curdirFlag:
-            model_folder = '.'
-        else:
-            model_folder = os.path.dirname(
-                os.path.realpath(__file__)) + '/models'
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
 
         if fringe_model_name is None:
-            model_name = '%s/fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.model' % (model_folder,
-                                                 name,
+            model_name = 'fringe_%s_comp%02d.' \
+                         'c%02d_q%i.%s.model' % (name,
                                                  n_components,
                                                  cid,
                                                  qid,
                                                  timestamp)
         else:
-            model_name = '%s/fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.%s.model' % (model_folder,
-                                                    name,
+            model_name = 'fringe_%s_comp%02d.' \
+                         'c%02d_q%i.%s.%s.model' % (name,
                                                     n_components,
                                                     cid,
                                                     qid,
@@ -103,12 +95,12 @@ def generate_models(fname_arr,
                           name))
 
         t0 = time()
-        estimator.fit(fringes_flattened)  # subtracts mean and whitens
+        estimator.fit(fringe_maps_flattened)  # subtracts mean and whitens
         train_time = (time() - t0)
         print("Fitting Model: done in %0.3fs" % train_time)
 
         joblib.dump(estimator, model_name)
-        print('Estimator saved as: %s' % model_name)
+        print('Fringe Model saved as: %s' % model_name)
 
         log_name = model_name.replace('.model', '.model_list')
         with open(log_name, 'w') as f:
@@ -117,33 +109,34 @@ def generate_models(fname_arr,
         print('Log saved as: %s' % log_name)
 
         if plotFlag:
-            title = '%s components' % (os.path.basename(model_name)
-                                       .replace('.model', ''))
+            model_name = os.path.basename(model_name)
+            model_name = model_name.replace('.model', '')
+            title = '%s components' % model_name
             plot_gallery(title,
                          estimator.components_[:n_components],
                          image_shape)
 
 
-def test_models(fringes_flattened,
+def test_models(fringe_maps_flattened,
                 image_shape,
                 rcid,
                 fringe_model_name=None,
                 n_components=6,
                 idx=None,
                 curdirFlag=False):
-    """Builds a fringe model for a random science image and subtracts the
-    fringe model from the fringe image. Generates a plot showing the
+    """Builds a fringe bias for a random science image and subtracts the
+    fringe bias from the fringe map. Generates a plot showing the
     difference.
 
     'idx=None' tests a random image from the list of images_flattened.
     'idx=0' tests the first image from the list of images_flattened, and so on.
     """
 
-    n_samples, n_features = fringes_flattened.shape
+    n_samples, n_features = fringe_maps_flattened.shape
 
     if idx is None:
         idx = np.random.choice(np.arange(n_samples), 1).astype(int)[0]
-    fringe = fringes_flattened[idx]
+    fringe_map = fringe_maps_flattened[idx]
 
     estimator_names = return_estimator_names()
 
@@ -180,16 +173,17 @@ def test_models(fringes_flattened,
         estimator = joblib.load(model_name)
 
         t0 = time()
-        fringe_transposed = fringe.reshape(1, len(fringe))
+        fringe_transposed = fringe_map.reshape(1, len(fringe_map))
         fringe_ica = estimator.transform(fringe_transposed)
-        fringe_model = estimator.inverse_transform(fringe_ica)
-        fringe_model = fringe_model.reshape(image_shape)
+        fringe_bias = estimator.inverse_transform(fringe_ica)
+        fringe_bias = fringe_bias.reshape(image_shape)
         model_time = (time() - t0)
-        print("Building fringe image from %s: done in %0.3fs" % (name,
-                                                                 model_time))
+        print("Building fringe bias from %s: done in %0.3fs" % (name,
+                                                                model_time))
 
-        title = '%s idx%i fringe vs model' % (os.path.basename(model_name)
-                                              .replace('.model', ''), idx)
+        model_name = os.path.basename(model_name)
+        model_name = model_name.replace('.model', '')
+        title = '%s idx%i fringe map vs fringe bias' % (model_name, idx)
         plot_before_and_after(title,
-                              fringe.reshape(image_shape),
-                              fringe_model)
+                              fringe_map.reshape(image_shape),
+                              fringe_bias)
