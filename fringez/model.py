@@ -124,8 +124,7 @@ def test_models(fringe_maps_flattened,
                 rcid,
                 fringe_model_name=None,
                 n_components=6,
-                idx=None,
-                curdirFlag=False):
+                idx=None):
     """Builds a fringe bias for a random science image and subtracts the
     fringe bias from the fringe map. Generates a plot showing the
     difference.
@@ -144,27 +143,20 @@ def test_models(fringe_maps_flattened,
 
     for name in estimator_names:
         timestamp = datetime.datetime.now().strftime('%Y%m%d')
-        if curdirFlag:
-            model_folder = '.'
-        else:
-            model_folder = os_path.dirname(
-                os_path.realpath(__file__)) + '/models'
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
 
         if fringe_model_name is None:
-            model_name = '%s/fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.model' % (model_folder,
-                                                 name,
+            model_name = 'fringe_%s_comp%02d.' \
+                         'c%02d_q%i.%s.model' % (name,
                                                  n_components,
                                                  cid,
                                                  qid,
                                                  timestamp)
         else:
-            model_name = '%s/fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.%s.model' % (model_folder,
-                                                    name,
+            model_name = 'fringe_%s_comp%02d.' \
+                         'c%02d_q%i.%s.%s.model' % (name,
                                                     n_components,
                                                     cid,
                                                     qid,
