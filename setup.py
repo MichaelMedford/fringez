@@ -12,7 +12,7 @@ MAINTAINER = 'Michael Medford'
 MAINTAINER_EMAIL = 'michaelmedford@berkeley.edu'
 URL = 'https://github.com/MichaelMedford/fringez'
 LICENSE = 'MIT'
-VERSION = open('fringez/VERSION').readline().strip()
+VERSION = open('VERSION').readline().strip()
 DOWNLOAD_URL = 'https://github.com/MichaelMedford/fringez/tarball/%s' % VERSION
 
 try:
