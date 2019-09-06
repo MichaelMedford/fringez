@@ -9,7 +9,7 @@ model can then be used to generate a fringe bias image for each i-band image
 which, when subtraction from the i-band image, removes the atmospheric fringes.
 This results in a clean i-band image.  
 
-![Diagram of fringez schema](frinez_diagram.jpeg)
+![](frinez_diagram.jpeg "Diagram of fringez schema")
 
 ```fringez``` installs three executables.
 
