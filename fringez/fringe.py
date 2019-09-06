@@ -1,23 +1,25 @@
 #!/usr/bin/env python
 """fringe.py"""
-import joblib
+from joblib import load as joblib_load
 from astropy.io import fits
-import numpy as np
-import glob
-import sys
-import os
-from utils import create_fits
-from utils import flatten_images
+from numpy import median as np_median
+from numpy import abs as np_abs
+from numpy import zeros_like as np_zeros_like
+from glob import glob
+from sys import exit as sys_exit
+from os import path as os_path
+from fringez.utils import create_fits
+from fringez.utils import flatten_images
 
 
 def generate_fringe_map(image):
     """ Create a fringe image from a science image."""
-    median = np.median(image)
-    median_absdev = np.median(np.abs(image - median))
+    median = np_median(image)
+    median_absdev = np_median(np_abs(image - median))
     pixel_5sigma_plus = median + (median_absdev * 1.48 * 5)
     pixel_5sigma_minus = median - (median_absdev * 1.48 * 5)
 
-    fringe_map = np.zeros_like(image)
+    fringe_map = np_zeros_like(image)
     fringe_map[:] = image[:]
     cond1 = fringe_map >= pixel_5sigma_plus
     cond2 = fringe_map <= pixel_5sigma_minus
@@ -42,7 +44,7 @@ def gather_fringes():
     """Gathers all of the science images in the directory and returns a list
     of the fringe images, as well as the rcid of the science images."""
 
-    fname_arr = glob.glob('ztf*sciimg.fits')
+    fname_arr = glob('ztf*sciimg.fits')
     fname_arr.sort()
 
     with fits.open(fname_arr[0]) as f:
@@ -69,7 +71,7 @@ def gather_fringes():
                 print('%s != %s' % (str(fringe.shape), str(image_shape)))
                 print('** ALL FRINGE IMAGES MUST BE THE SAME SIZE **')
                 print('** EXITING **')
-                sys.exit(0)
+                sys_exit(0)
 
         fringes.append(fringe)
 
@@ -93,13 +95,13 @@ def remove_fringe(image_name,
     Models are loaded from disk as
     fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
 
-    if not os.path.exists(image_name):
+    if not os_path.exists(image_name):
         print('Image missing! Exiting...')
-        sys.exit(0)
+        sys_exit(0)
 
-    if not os.path.exists(fringe_model_name):
+    if not os_path.exists(fringe_model_name):
         print('Fringe model missing! Exiting...')
-        sys.exit(0)
+        sys_exit(0)
 
     print('Generating clean image for %s' % image_name)
 
@@ -110,7 +112,7 @@ def remove_fringe(image_name,
 
     fringe_map, median_absdev = generate_fringe_map(image)
 
-    estimator = joblib.load(fringe_model_name)
+    estimator = joblib_load(fringe_model_name)
 
     fringe_map = fringe_map.flatten()
     fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))

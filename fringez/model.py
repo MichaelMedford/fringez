@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 """model.py"""
-import numpy as np
+from numpy import random as np_random
+from numpy import arange as np_arange
 from sklearn import decomposition
-import joblib
+from joblib import load as joblib_load
+from joblib import dump as joblib_dump
 from time import time
-import datetime
-import os
-from plot import plot_before_and_after
-from plot import plot_gallery
+from datetime import datetime
+from os import path as os_path
+from fringez.plot import plot_before_and_after
+from fringez.plot import plot_gallery
 
 
 def return_estimators(n_components):
@@ -69,7 +71,7 @@ def generate_models(fname_arr,
     estimators = return_estimators(n_components=n_components)
 
     for name, estimator in estimators:
-        timestamp = datetime.datetime.now().strftime('%Y%m%d')
+        timestamp = datetime.now().strftime('%Y%m%d')
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
@@ -99,7 +101,7 @@ def generate_models(fname_arr,
         train_time = (time() - t0)
         print("Fitting Model: done in %0.3fs" % train_time)
 
-        joblib.dump(estimator, model_name)
+        joblib_dump(estimator, model_name)
         print('Fringe Model saved as: %s' % model_name)
 
         log_name = model_name.replace('.model', '.model_list')
@@ -109,7 +111,7 @@ def generate_models(fname_arr,
         print('Log saved as: %s' % log_name)
 
         if plotFlag:
-            model_name = os.path.basename(model_name)
+            model_name = os_path.basename(model_name)
             model_name = model_name.replace('.model', '')
             title = '%s components' % model_name
             plot_gallery(title,
@@ -135,7 +137,7 @@ def test_models(fringe_maps_flattened,
     n_samples, n_features = fringe_maps_flattened.shape
 
     if idx is None:
-        idx = np.random.choice(np.arange(n_samples), 1).astype(int)[0]
+        idx = np_random.choice(np_arange(n_samples), 1).astype(int)[0]
     fringe_map = fringe_maps_flattened[idx]
 
     estimator_names = return_estimator_names()
@@ -145,8 +147,8 @@ def test_models(fringe_maps_flattened,
         if curdirFlag:
             model_folder = '.'
         else:
-            model_folder = os.path.dirname(
-                os.path.realpath(__file__)) + '/models'
+            model_folder = os_path.dirname(
+                os_path.realpath(__file__)) + '/models'
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
@@ -170,7 +172,7 @@ def test_models(fringe_maps_flattened,
                                                     timestamp)
         print('Working on %s...' % name)
 
-        estimator = joblib.load(model_name)
+        estimator = joblib_load(model_name)
 
         t0 = time()
         fringe_transposed = fringe_map.reshape(1, len(fringe_map))
@@ -181,7 +183,7 @@ def test_models(fringe_maps_flattened,
         print("Building fringe bias from %s: done in %0.3fs" % (name,
                                                                 model_time))
 
-        model_name = os.path.basename(model_name)
+        model_name = os_path.basename(model_name)
         model_name = model_name.replace('.model', '')
         title = '%s idx%i fringe map vs fringe bias' % (model_name, idx)
         plot_before_and_after(title,

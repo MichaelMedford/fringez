@@ -2,12 +2,12 @@
 
 """fringez-clean"""
 import argparse
-import glob
+from glob import glob
 from fringez.fringe import remove_fringe
 
 
 def return_model_template(fringe_model_folder):
-    model = glob.glob(fringe_model_folder + '/fringe*model')[0]
+    model = glob(fringe_model_folder + '/fringe*model')[0]
     model_prefix = model.split('.')[0]
     model_suffix = '.'.join(model.split('.')[-2:])
     return model_prefix, model_suffix
@@ -98,7 +98,7 @@ def main():
         # Subtract the fringe model to all science images in the directory
         print('*** ---all-images-in-folder selected, cleaning all images '
               'in the current directory')
-        images = glob.glob('ztf*sciimg.fits')
+        images = glob('ztf*sciimg.fits')
 
         if args.parallelFlag:
             from mpi4py import MPI

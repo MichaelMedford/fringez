@@ -1,9 +1,12 @@
 #!/usr/bin/env python
 """utils.py"""
-import numpy as np
-import glob
+from numpy import random as np_random
+from numpy import arange as np_arange
+from numpy import array as np_array
+from glob import glob
 from astropy.io import fits
-import os
+from os import path as os_path
+from os import remove as os_remove
 
 
 def flatten_images(images):
@@ -15,7 +18,7 @@ def flatten_images(images):
         if i % 10 == 0:
             print('Flattening image %i/%i' % (i, len(images)))
         images_flattened.append(image.flatten())
-    images_flattened = np.array(images_flattened)
+    images_flattened = np_array(images_flattened)
 
     return images_flattened, image_shape
 
@@ -36,8 +39,8 @@ def create_fits(image_name,
         hdu.header = header
 
     # Remove the image if it currently exists
-    if os.path.exists(image_name):
-        os.remove(image_name)
+    if os_path.exists(image_name):
+        os_remove(image_name)
 
     # Write the fits image to disk
     hdu.writeto(image_name)
@@ -47,12 +50,12 @@ def generate_random_ds9_list(n_random=6):
     """ Generates a random list of images to be viewed in ds9
     Viewed with: ds9 -zscale $(<ds9.list) """
 
-    fname_arr = glob.glob('ztf*sciimg.clean.fits')
+    fname_arr = glob('ztf*sciimg.clean.fits')
     fname_arr.sort()
 
     n_images = min(n_random, len(fname_arr))
 
-    idx_arr = np.random.choice(np.arange(len(fname_arr)), n_images,
+    idx_arr = np_random.choice(np_arange(len(fname_arr)), n_images,
                                replace=False)
     with open('ds9.list', 'w') as f:
         for idx in idx_arr:

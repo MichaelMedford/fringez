@@ -42,7 +42,8 @@ setup(name=DISTNAME,
                         'matplotlib',
                         'scikit-learn>=0.19.1,<0.19.2'],
       scripts=['bin/fringez-generate',
-               'bin/fringez-clean'],
+               'bin/fringez-clean',
+               'bin/fringez-download'],
       classifiers=['Intended Audience :: Science/Research',
                    'Programming Language :: Python :: 3.6',
                    'License :: OSI Approved :: MIT License',
@@ -51,4 +52,4 @@ setup(name=DISTNAME,
                    'Operating System :: Unix',
                    'Operating System :: MacOS'],
       project_urls={'Models': 'https://portal.nersc.gov/project/ztf/iband'}
-)
+      )
