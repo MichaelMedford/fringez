@@ -37,7 +37,7 @@ cd fringez
 python setup.py install
 ```
 
-#### Downloading Fringe Models
+### Downloading Fringe Models
 Users must have fringe models on disk in order to clean i-band images with 
 atmospheric fringes. These fringe models are what generate a fringe bias 
 image for each contaminated i-band image which, when subtraction from the 
@@ -57,7 +57,7 @@ will end up in a folder named ```MODEL_DATE```.
 Current model versions (and size after extraction):
 * 20190618 (16 GB)
 
-#### Generating Clean Images
+### Generating Clean Images
 Contaminated images can be cleaned with the ```fringez-clean``` executable.
 
 Contaminated images can either be cleaned one at a time with the 
@@ -67,7 +67,7 @@ filename as the science images, but with the extension ```sciimg.clean.fits```.
 To save the fringe bias images to disk for debugging, select the ```-debug``` 
 argument.
 
-**Cleaning all contaminated images in a folder**
+#### Cleaning all contaminated images in a folder
 
 Cleaning a folder of contaminated images requires specifying the folder where 
 fringe models are located. ```fringez-clean``` will automatically pair the 
@@ -85,7 +85,7 @@ Parallelization is executed with the mpi4py package and simply splits the list
 of images in the folder across the processes used to launch the 
 ```fringez-clean``` executable.
 
-**Cleaning a single contaminated image**
+#### Cleaning a single contaminated image
 
 Cleaning a single contaminated image requires specifying a fringe model. This 
 fringe model should match the readout channel ID of the contaminated image. 
@@ -101,7 +101,7 @@ execute ```fringez-clean -single-image -image-name={IMAGE_NAME}
 ```-fringe-model-name``` arguments must be set when ```-single-image``` is 
 selected.  
 
-#### Generating Fringe Models
+### Generating Fringe Models
 *Note: Downloading pre-generated models using the fringez-download executable 
 is recommended. Most users will not need to generate new fringe models*
 
