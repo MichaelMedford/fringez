@@ -110,8 +110,8 @@ Fringe models are generated with the ```fringez-generate``` executable.
 The models which will be generated are listed in 
 ```$PATH_TO_FRINGEZ_DIR/model.py:return_estimators```. 
 The number of components in each model fit are set with the 
-```--n-components``` argument. Plots of the eigenimages can be generated for 
-debugging with the ```--plots``` argument.
+```-n-components``` argument. Plots of the eigenimages can be generated for 
+debugging with the ```-plots``` argument.
  
 To generate fringe models:
 
