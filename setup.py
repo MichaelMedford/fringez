@@ -4,7 +4,7 @@ __setup__.py
 Inspired by: https://github.com/pypa/sampleproject
 """
 
-DESCRIPTION = "Removing atmospheric fringes from ZTF i-band images."
+DESCRIPTION = "Removing atmospheric fringes from ZTF i-band images"
 
 DISTNAME = 'fringez'
 AUTHOR = 'Michael Medford'
