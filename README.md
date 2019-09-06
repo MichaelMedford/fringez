@@ -11,8 +11,8 @@ used to generate a fringe bias image for each contaminated i-band image which,
 when subtraction from the i-band image, removes the atmospheric fringes. 
 This results in a clean i-band image.  
 
-**Diagram of fringez Schema**
-![](fringez_diagram.jpeg)
+**Diagram of fringez Scripts**
+![](https://github.com/MichaelMedford/fringez/blob/38c05f6047fa4ba5150b2e1ce94b9052b2a9df7e/fringez_diagram.jpeg)
 
 ```fringez``` installs three executables.
 
