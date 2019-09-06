@@ -124,6 +124,7 @@ def remove_fringe(image_name,
     fringe_bias *= median_absdev
 
     header = append_eigenvalues_to_header(header, fringe_ica)
+    header['FRNGMDL'] = os_path.basename(fringe_model_name)
 
     image_clean = image - fringe_bias
     image_clean_fname = image_name.replace('.fits', '.clean.fits')
@@ -131,7 +132,7 @@ def remove_fringe(image_name,
     print('-- %s saved to disk' % image_clean_fname)
 
     if debugFlag:
-        extension = os.path.basename(fringe_model_name).replace('.model',
+        extension = os_path.basename(fringe_model_name).replace('.model',
                                                                 '.bias')
         fname = image_name.replace('.fits', '.%s.fits' % extension)
         create_fits(fname, fringe_bias, header)

@@ -119,16 +119,15 @@ To generate fringe models:
 directory must have the same RCID. Models are made separately for each ZTF 
 RCID.** Image names are expected to begin with **ztf** and end with 
 ```sciimg.fits```. 
-2) From within this folder, execute ```python 
-$PATH_TO_FRINGEZ_DIR/generate_fringe_model.py```. By default the script will 
-choose six components and will not generate debugging plots. 
+2) From within this folder, execute ```fringez-generate```. By default the 
+script will choose six components and will not generate debugging plots. 
 3) The current directory will now contain a model or models of the fringes, 
 named **fringe\_{MODEL_NAME}\_comp{N_COMPONENTS}.c{CID}\_q{QID}.{DATE}.model**. 
 By default the script will only generate **PCArandom** models, but more models 
-can be tested by editing the ```return_estimators``` function in 
-```model.py```. The current directory will also contain a ```*.model_list``` 
-file for each model listing the images that went into the creation of the 
-model.
+can be tested by editing the 
+```$PATH_TO_FRINGEZ_DIR/model.py:return_estimators``` function. The current 
+directory will also contain a ```*.model_list``` file for each model listing 
+the images that went into the creation of the model.
 
 ## Requirements
 * Python 3.6
