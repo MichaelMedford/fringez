@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ "$1" == "-h" ]; then
+  echo "Visit https://github.com/MichaelMedford/fringez for instructions."
+  exit 0
+fi
+
 read -p "MODEL_DATE: " MODEL_DATE
 
 filename=ztf_iband_fringe_models_${MODEL_DATE}.tar.gz
