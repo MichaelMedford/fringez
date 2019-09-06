@@ -10,7 +10,7 @@ which, when subtraction from the i-band image, removes the atmospheric fringes.
 This results in a clean i-band image.  
 
 **Diagram of fringez Schema**
-![](frinez_diagram.jpeg)
+![](fringez_diagram.jpeg)
 
 ```fringez``` installs three executables.
 
