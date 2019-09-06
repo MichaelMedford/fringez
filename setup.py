@@ -51,5 +51,5 @@ setup(name=DISTNAME,
                    'Operating System :: POSIX',
                    'Operating System :: Unix',
                    'Operating System :: MacOS'],
-      project_urls={'Models': 'https://portal.nersc.gov/project/ztf/iband'}
+      project_urls={'Models': 'https://portal.nersc.gov/project/ptf/iband'}
       )

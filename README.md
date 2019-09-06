@@ -131,7 +131,7 @@ file for each model listing the images that went into the creation of the
 model.
 
 ## Requirements
-* Python 3
+* Python 3.6
 
 ## Authors
 
