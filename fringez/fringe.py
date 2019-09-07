@@ -89,6 +89,13 @@ def append_eigenvalues_to_header(header, fringe_ica):
 
 
 def calculate_fringe_bias(fringe_map, fringe_model):
+    """ Generates fringe bias image for the provided science image.
+    These formulas are taken from the scikit-learn estimator's
+    transform and inverse transform methods.
+
+    Models are loaded from disk as
+    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
+
     fringe_map = fringe_map.flatten()
     fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))
 
@@ -109,8 +116,7 @@ def calculate_fringe_bias(fringe_map, fringe_model):
 def remove_fringe(image_name,
                   fringe_model_name,
                   debugFlag=False):
-    """ Generates fringe bias image for the provided science image and
-    and subtracts that fringe bias image from the science image, resulting in
+    """ Subtracts the fringe bias image from the science image, resulting in
     a clean image with extension *sciimg.clean.fits.
 
     Models are loaded from disk as
