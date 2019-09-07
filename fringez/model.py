@@ -3,13 +3,15 @@
 from numpy import random as np_random
 from numpy import arange as np_arange
 from sklearn import decomposition
-from joblib import load as joblib_load
-from joblib import dump as joblib_dump
 from time import time
 from datetime import datetime
 from os import path as os_path
+from shutil import move as shutil_move
+from numpy import savez as np_savez
+from numpy import load as np_load
 from fringez.plot import plot_before_and_after
 from fringez.plot import plot_gallery
+from fringez.fringe import calculate_fringe_bias
 
 
 def return_estimators(n_components):
@@ -78,19 +80,19 @@ def generate_models(fname_arr,
 
         if fringe_model_name is None:
             model_name = 'fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.model' % (name,
-                                                 n_components,
-                                                 cid,
-                                                 qid,
-                                                 timestamp)
+                         'c%02d_q%i.%s' % (name,
+                                           n_components,
+                                           cid,
+                                           qid,
+                                           timestamp)
         else:
             model_name = 'fringe_%s_comp%02d.' \
-                         'c%02d_q%i.%s.%s.model' % (name,
-                                                    n_components,
-                                                    cid,
-                                                    qid,
-                                                    fringe_model_name,
-                                                    timestamp)
+                         'c%02d_q%i.%s.%s' % (name,
+                                              n_components,
+                                              cid,
+                                              qid,
+                                              fringe_model_name,
+                                              timestamp)
         print("Extracting the "
               "top %d components "
               "in %s " % (n_components,
@@ -101,18 +103,20 @@ def generate_models(fname_arr,
         train_time = (time() - t0)
         print("Fitting Model: done in %0.3fs" % train_time)
 
-        joblib_dump(estimator, model_name)
-        print('Fringe Model saved as: %s' % model_name)
+        np_savez(model_name,
+                 mean=estimator.mean_,
+                 components=estimator.components_,
+                 explained_variance=estimator.explained_variance_)
+        shutil_move(model_name + '.npz', model_name + '.model')
+        print('Fringe Model saved as: %s.model' % model_name)
 
-        log_name = model_name.replace('.model', '.model_list')
+        log_name = model_name + '.model_list'
         with open(log_name, 'w') as f:
             for fname in fname_arr:
                 f.write('%s\n' % fname)
         print('Log saved as: %s' % log_name)
 
         if plotFlag:
-            model_name = os_path.basename(model_name)
-            model_name = model_name.replace('.model', '')
             title = '%s components' % model_name
             plot_gallery(title,
                          estimator.components_[:n_components],
@@ -164,12 +168,10 @@ def test_models(fringe_maps_flattened,
                                                     timestamp)
         print('Working on %s...' % name)
 
-        estimator = joblib_load(model_name)
+        fringe_model = np_load(model_name)
 
         t0 = time()
-        fringe_transposed = fringe_map.reshape(1, len(fringe_map))
-        fringe_ica = estimator.transform(fringe_transposed)
-        fringe_bias = estimator.inverse_transform(fringe_ica)
+        fringe_bias, _ = calculate_fringe_bias(fringe_map, fringe_model)
         fringe_bias = fringe_bias.reshape(image_shape)
         model_time = (time() - t0)
         print("Building fringe bias from %s: done in %0.3fs" % (name,

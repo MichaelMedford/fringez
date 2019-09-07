@@ -1,10 +1,13 @@
 #!/usr/bin/env python
 """fringe.py"""
-from joblib import load as joblib_load
 from astropy.io import fits
 from numpy import median as np_median
 from numpy import abs as np_abs
 from numpy import zeros_like as np_zeros_like
+from numpy import dot as np_dot
+from numpy import sqrt as np_sqrt
+from numpy import newaxis as np_newaxis
+from numpy import load as np_load
 from glob import glob
 from sys import exit as sys_exit
 from os import path as os_path
@@ -85,6 +88,24 @@ def append_eigenvalues_to_header(header, fringe_ica):
     return header
 
 
+def calculate_fringe_bias(fringe_map, fringe_model):
+    fringe_map = fringe_map.flatten()
+    fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))
+
+    mean = fringe_model['mean']
+    components = fringe_model['components']
+    explained_variance = fringe_model['explained_variance']
+
+    fringe_map_transposed = fringe_map_transposed - mean
+    fringe_ica = np_dot(fringe_map_transposed, components.T)
+    fringe_ica /= np_sqrt(explained_variance)
+
+    fringe_bias = np_dot(fringe_ica, np_sqrt(
+        explained_variance[:, np_newaxis]) * components) + mean
+
+    return fringe_bias, fringe_ica
+
+
 def remove_fringe(image_name,
                   fringe_model_name,
                   debugFlag=False):
@@ -112,15 +133,10 @@ def remove_fringe(image_name,
 
     fringe_map, median_absdev = generate_fringe_map(image)
 
-    estimator = joblib_load(fringe_model_name)
+    fringe_model = np_load(fringe_model_name)
 
-    fringe_map = fringe_map.flatten()
-    fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))
-    fringe_ica = estimator.transform(fringe_map_transposed)
-
-    fringe_bias = estimator.inverse_transform(fringe_ica)
+    fringe_bias, fringe_ica = calculate_fringe_bias(fringe_map, fringe_model)
     fringe_bias = fringe_bias.reshape(image_shape)
-
     fringe_bias *= median_absdev
 
     header = append_eigenvalues_to_header(header, fringe_ica)
