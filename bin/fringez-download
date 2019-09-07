@@ -7,13 +7,16 @@ fi
 
 read -p "MODEL_DATE: " MODEL_DATE
 
-filename=ztf_iband_fringe_models_${MODEL_DATE}.tar.gz
+dirname=ztf_iband_fringe_models_${MODEL_DATE}
 
 echo Downloading ${filename}...
-wget https://portal.nersc.gov/project/ptf/iband/$filename
 
-echo Extracting ${filename}...
-gunzip $filename
-tar -xvf ${filename%.gz}
+mkdir $MODEL_DATE
+cd $MODEL_DATE
+wget --recursive --level=1 --no-parent --no-directories  --accept '*model*' \
+--directory-prefix=. https://portal.nersc.gov/project/ptf/iband/$dirname
+rm $dirname
+rm *robots*
+cd ..
 
 echo ${MODEL_DATE} Models Downloaded
