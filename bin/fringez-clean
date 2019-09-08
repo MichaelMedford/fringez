@@ -83,7 +83,7 @@ def main():
                                action='store_true',
                                help='Run in parallel mode. This is '
                                     'recommended when selecting '
-                                    '-all-images-in-folder.')
+                                    '-all-images-in-folder. Requires mpi4py.')
     parser.set_defaults(parallelFlag=False)
 
     args = parser.parse_args()
