@@ -3,6 +3,8 @@
 """fringez-clean"""
 import argparse
 from glob import glob
+import subprocess
+import sys
 from fringez.fringe import remove_fringe
 
 
@@ -81,6 +83,13 @@ def main():
     parser.set_defaults(parallelFlag=False)
 
     args = parser.parse_args()
+
+    if args.parallelFlag:
+        reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
+        installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
+        if 'mpi4py' not in installed_packages:
+            print('mpi4py must be installed to use -parallel mode.')
+            sys.exit(0)
 
     if args.allFlag:
         if not args.fringe_model_folder:
