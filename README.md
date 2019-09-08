@@ -44,18 +44,25 @@ image for each contaminated i-band image which, when subtraction from the
 i-band image, removes the atmospheric fringes. This results in a clean i-band 
 image.  
 
-To download fringe models for all 64 ZTF readout channels, execute the 
-```fringez-download``` executable.
+Pre-generated fringe models can be downloaded from the NERSC web portal 
+with the ```fringez-download``` executable. Select a ```-fringe-model-date``` 
+from the below list to download a version of the pre-generated fringe models. 
+The script will also download the model lists, containing the list of images 
+used to create the fringe model. 
 
-This script will download pre-generated fringe models that are stored on 
-a NERSC web portal.  You will be asked to input a ```MODEL_DATE``` 
-which signifies the version of the saved models. Models will be downloaded to 
-disk in the user's current directory and extracted from a tar.gz file. Models 
-(```*.model```) and the lists of files that created them (```*.model_lists```) 
-will end up in a folder named ```MODEL_DATE```.
+Current model versions:
+* 20190907 (16 GB)
 
-Current model versions (and size after extraction):
-* 20190618 (16 GB)
+Fringe models can either be downloaded for all 64 readout channels with the 
+```-all``` argument, or only a single fringe model can be downloaded with 
+the ```-single``` argument. If the ```-single``` argument is selected, then 
+only the model with the ```-fringe-model-id``` argument is downloaded. The 
+```-fringe-model-id``` is the cid and the qid of the fringe model combined 
+in the following syntax: c01_q1
+
+By default the fringe models and fringe model lists will be downloaded to the 
+current directoy, but can also be sent a specific directory with the 
+```-fringe-model-folder``` argument.
 
 ### Generating Clean Images
 Contaminated images can be cleaned with the ```fringez-clean``` executable.
