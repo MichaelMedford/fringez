@@ -48,8 +48,10 @@ def main():
 
     arguments = parser.add_argument_group('arguments')
     arguments.add_argument('-fringe-model-date', type=str,
-                           help='MODEL_DATE for downloading pre-generated '
-                                'models from the NERSC web portal.',
+                           help='Model date for downloading pre-generated '
+                                'models from the NERSC web portal. See '
+                                'fringez github page for list of available '
+                                'model dates.',
                            required=True)
     arguments.add_argument('-fringe-model-folder', type=str,
                            help='Models are downloaded by default into the '
