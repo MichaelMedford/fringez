@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 """
-fringez-download
+fringez-download :
 
 Download pre-generated fringe models from the NERSC web portal.
 """
