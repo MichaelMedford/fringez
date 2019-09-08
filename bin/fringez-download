@@ -70,11 +70,13 @@ def main():
     allgroup = parser.add_mutually_exclusive_group()
     allgroup.add_argument('-all', dest='allFlag',
                           action='store_true',
-                          help='Download all fringe models in the MODEL_DATE directory. DEFAULT.')
+                          help='Download all fringe models in the '
+                               '-fringe-model-date directory. DEFAULT.')
     allgroup.add_argument('-single', dest='allFlag',
                           action='store_false',
-                          help='Download only a single fringe model from the MODEL_DATE directory. '
-                               'Requires setting the -fringe-model-id argument.')
+                          help='Download only a single fringe model from the '
+                               '-fringe-model-date directory. Requires '
+                               'setting the -fringe-model-id argument.')
     parser.set_defaults(allFlag=False)
 
     args = parser.parse_args()
