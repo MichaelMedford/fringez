@@ -1,80 +1,90 @@
 #!/usr/bin/env python3
 
-"""fringez-clean"""
-
-# if [ "$1" == "-h" ]; then
-#   echo "Visit https://github.com/MichaelMedford/fringez for instructions."
-#   exit 0
-# fi
-#
-# read -p "MODEL_DATE: " MODEL_DATE
-#
-# dirname=ztf_iband_fringe_models_${MODEL_DATE}
-#
-# echo Downloading ${filename}...
-#
-# mkdir $MODEL_DATE
-# cd $MODEL_DATE
-# wget --recursive --level=1 --no-parent --no-directories  --accept '*model*' \
-# --directory-prefix=. https://portal.nersc.gov/project/ptf/iband/$dirname
-# rm $dirname
-# rm *robots*
-# cd ..
-#
-# echo ${MODEL_DATE} Models Downloaded
-
+"""fringez-download"""
+import os
 import sys
 import argparse
 import requests
 import wget
 from bs4 import BeautifulSoup
 
-NERSC_url = 'https://portal.nersc.gov/project/ptf/iband/'
+NERSC_url = 'https://portal.nersc.gov/project/ptf/' \
+            'iband/ztf_iband_fringe_models_'
 
-def download_models(model_date, model_id=None):
-	source_code = requests.get(NERSC_url + model_date)
-	plain_text = source_code.text
-	soup = BeautifulSoup(plain_text, "html.parser")
-	for link in soup.findAll('a'):
-		if not 'model' in link:
-			continue
-		href = link.get('href')
-		wget.download(NERSC_url + model_date + '/' + href)
+
+def download_models(model_date, fringe_model_dir, model_id=None):
+    source_code = requests.get(NERSC_url + model_date)
+    plain_text = source_code.text
+    soup = BeautifulSoup(plain_text, "html.parser")
+
+    outdir = fringe_model_dir + '/' + model_date
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    if model_id:
+        print('Downloading model and model lists %s to %s' % (model_id,
+                                                              outdir))
+    else:
+        print('Downloading all models and model lists to %s' % outdir)
+
+    for link in soup.findAll('a'):
+        href = link.get('href')
+        if 'model' not in href:
+            continue
+        if model_id and model_id not in href:
+            continue
+        wget.download(NERSC_url + model_date + '/' + href, out=outdir)
+
 
 def main():
-	"""DESCRIPTION HERE"""
+    """Download pre-generated fringe models from the NERSC web portal."""
 
-	# Get arguments
-	parser = argparse.ArgumentParser(description=__doc__)
+    # Get arguments
+    parser = argparse.ArgumentParser(description=__doc__)
 
-	arguments = parser.add_argument_group('arguments')
-	arguments.add_argument('-fringe-model-date', type=str,
-                         help='MODEL_DATE for downloading pre-generated models from the NERSC web portal.')
-	arguments.add_argument('-fringe-model-id', type=str,
-                         help='If -single is selected, the -fringe-model-id is the single fringe model downloaded'
-                              'from the NERSC web portal. The -fringe-model-id is the cid and the qid of the fringe '
-                              'model combined in the following syntax: c01_q1')
+    arguments = parser.add_argument_group('arguments')
+    arguments.add_argument('-fringe-model-date', type=str,
+                           help='MODEL_DATE for downloading pre-generated '
+                                'models from the NERSC web portal.',
+                           required=True)
+    arguments.add_argument('-fringe-model-folder', type=str,
+                           help='Models are downloaded by default into the '
+                                'current directory. -fringe-model-folder will '
+                                'direct the models to be downloaded to this '
+                                'folder instead.',
+                           default='.')
+    arguments.add_argument('-fringe-model-id', type=str,
+                           help='If -single is selected, only the fringe '
+                                'model containing the -fringe-model-id is'
+                                ' downloaded from the NERSC web portal. The '
+                                '-fringe-model-id is the cid and the qid of '
+                                'the fringe model combined in the following '
+                                'syntax: c01_q1')
 
-	allgroup = parser.add_mutually_exclusive_group()
-	allgroup.add_argument('-all', dest='allFlag',
-                         action='store_true',
-                         help='Download all fringe models in the MODEL_DATE directory. DEFAULT.')
-	allgroup.add_argument('-single', dest='allFlag',
-                         action='store_false',
-                         help='Download only a single fringe model from the MODEL_DATE directory. '
-                              'Requires setting the -fringe-model-id argument.')
-	parser.set_defaults(allFlag=False)
+    allgroup = parser.add_mutually_exclusive_group()
+    allgroup.add_argument('-all', dest='allFlag',
+                          action='store_true',
+                          help='Download all fringe models in the MODEL_DATE directory. DEFAULT.')
+    allgroup.add_argument('-single', dest='allFlag',
+                          action='store_false',
+                          help='Download only a single fringe model from the MODEL_DATE directory. '
+                               'Requires setting the -fringe-model-id argument.')
+    parser.set_defaults(allFlag=False)
 
-	args = parser.parse_args()
+    args = parser.parse_args()
 
-	if not args.allFlag and not args.fringe_model_id:
-		print('-fringe-model-id must be set if -single is selected')
-		sys.exit(0)
+    if not args.allFlag and not args.fringe_model_id:
+        print('-fringe-model-id must be set if -single is selected')
+        sys.exit(0)
 
-	if args.allFlag:
-		download_models(args.fringe_model_date)
-	else:
-		download_models(arge.fringe_model_date, args.fringe_model_id)
+    if args.allFlag:
+        download_models(args.fringe_model_date,
+                        args.fringe_model_folder)
+    else:
+        download_models(args.fringe_model_date,
+                        args.fringe_model_folder,
+                        model_id=args.fringe_model_id)
+
 
 if __name__ == '__main__':
-	main()
+    main()
