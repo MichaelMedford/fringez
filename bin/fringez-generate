@@ -9,7 +9,7 @@ the directory. The model is saved to disk.
 import argparse
 from fringez.model import generate_models
 from fringez.model import test_models
-from fringez.fringe import gather_flat_fringes
+from fringez.fringe import gather_flat_fringe_maps
 
 
 def main():
@@ -41,10 +41,10 @@ def main():
     args = parser.parse_args()
 
     # Generate the fringe model from the fringe images in the directory
-    fname_arr, fringes_flattened, image_shape, rcid = gather_flat_fringes()
+    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps()
 
     generate_models(fname_arr,
-                    fringes_flattened,
+                    fringe_maps_flattened,
                     image_shape,
                     rcid,
                     fringe_model_name=args.fringe_model_name,
@@ -53,7 +53,7 @@ def main():
 
     if args.plotFlag:
         # Apply the fringe model to a random image for testing
-        test_models(fringes_flattened,
+        test_models(fringe_maps_flattened,
                     image_shape,
                     rcid,
                     fringe_model_name=args.fringe_model_name,

@@ -35,17 +35,17 @@ def generate_fringe_map(image):
     return fringe_map, median_absdev
 
 
-def gather_flat_fringes():
+def gather_flat_fringe_maps():
     """Gathers all of the fringe images in the directory,
     flattened for 1D analysis"""
-    fname_arr, fringes, rcid = gather_fringes()
-    fringes_flattened, image_shape = flatten_images(fringes)
-    return fname_arr, fringes_flattened, image_shape, rcid
+    fname_arr, fringes, rcid = gather_fringe_maps()
+    fringe_maps_flattened, image_shape = flatten_images(fringes)
+    return fname_arr, fringe_maps_flattened, image_shape, rcid
 
 
-def gather_fringes():
+def gather_fringe_maps():
     """Gathers all of the science images in the directory and returns a list
-    of the fringe images, as well as the rcid of the science images."""
+    of the fringe maps, as well as the rcid of the science images."""
 
     fname_arr = glob('ztf*sciimg.fits')
     fname_arr.sort()
@@ -59,26 +59,26 @@ def gather_fringes():
         rcid = 0
 
     image_shape = None
-    fringes = []
+    fringe_maps = []
     for i, fname in enumerate(fname_arr):
         if i % 10 == 0:
             print('Generating fringe image %i/%i' % (i, len(fname_arr)))
         with fits.open(fname) as f:
             image = f[0].data
-        fringe, _ = generate_fringe_map(image)
+        fringe_map, _ = generate_fringe_map(image)
 
         if i == 0:
-            image_shape = fringe.shape
+            image_shape = fringe_map.shape
         else:
-            if fringe.shape != image_shape:
-                print('%s != %s' % (str(fringe.shape), str(image_shape)))
-                print('** ALL FRINGE IMAGES MUST BE THE SAME SIZE **')
+            if fringe_map.shape != image_shape:
+                print('%s != %s' % (str(fringe_map.shape), str(image_shape)))
+                print('** ALL FRINGE MAPS MUST BE THE SAME SIZE **')
                 print('** EXITING **')
                 sys_exit(0)
 
-        fringes.append(fringe)
+        fringe_maps.append(fringe_map)
 
-    return fname_arr, fringes, rcid
+    return fname_arr, fringe_maps, rcid
 
 
 def append_eigenvalues_to_header(header, fringe_ica):
