@@ -143,3 +143,6 @@ the images that went into the creation of the model.
 
 * Michael Medford <MichaelMedford@berkeley.edu>
 * Peter Nugent <penugent@lbl.gov>
+
+## Citation
+[![DOI](https://zenodo.org/badge/206685101.svg)](https://zenodo.org/badge/latestdoi/206685101)
