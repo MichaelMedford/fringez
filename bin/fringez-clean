@@ -111,6 +111,7 @@ def main():
         print('*** -all-images-in-folder selected, cleaning all images '
               'in the current directory')
         images = glob('ztf*sciimg.fits')
+        images.sort()
 
         if args.parallelFlag:
             from mpi4py import MPI
