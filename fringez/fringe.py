@@ -16,7 +16,7 @@ from fringez.utils import flatten_images
 
 
 def generate_fringe_map(image):
-    """ Create a fringe image from a science image."""
+    """ Create a fringe map from a science image."""
     median = np_median(image)
     median_absdev = np_median(np_abs(image - median))
     pixel_5sigma_plus = median + (median_absdev * 1.48 * 5)
