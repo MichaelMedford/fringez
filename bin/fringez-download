@@ -77,7 +77,7 @@ def main():
                           help='Download only a single fringe model from the '
                                '-fringe-model-date directory. Requires '
                                'setting the -fringe-model-id argument.')
-    parser.set_defaults(allFlag=False)
+    parser.set_defaults(allFlag=True)
 
     args = parser.parse_args()
 
