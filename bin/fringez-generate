@@ -71,6 +71,11 @@ def main():
 
     if fringe_maps_flattened is None:
         return
+    else:
+        print('Saving fringe_maps_flattened')
+        import numpy as np
+        np.save('fringe_maps_flattened.npy', fringe_maps_flattened)
+        return
 
     generate_models(fname_arr,
                     fringe_maps_flattened,

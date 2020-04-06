@@ -185,6 +185,7 @@ def gather_fringe_maps_parallel(N_samples):
         fringe_filename_arr = None
         image_shape = None
         fringe_maps = None
+        rcid = None
 
     fringe_filename_arr = comm.bcast(fringe_filename_arr, root=0)
     image_shape = comm.bcast(image_shape, root=0)
