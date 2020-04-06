@@ -137,7 +137,7 @@ def test_models(fringe_maps_flattened,
     n_samples, n_features = fringe_maps_flattened.shape
 
     if idx is None:
-        idx = np.random.choice(np.arange(n_samples), 1).astype(int)[0]
+        idx = np.random.choice(np.arange(n_samples))
     fringe_map = fringe_maps_flattened[idx]
 
     estimator_names = return_estimator_names()
