@@ -78,10 +78,6 @@ def main():
 
     if rank != 0:
         return
-    else:
-        import numpy as np
-        np.save('fringe_maps_flattened.npy', fringe_maps_flattened)
-        return
 
     generate_models(fname_arr,
                     fringe_maps_flattened,
