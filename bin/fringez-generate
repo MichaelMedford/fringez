@@ -34,7 +34,7 @@ def main():
     arguments.add_argument('-fringe-model-name', type=int,
                            default=None,
                            help='If selected, forces the generated fringe '
-                                'models to include this name.')
+                                'models to include this name. DEFAULT None.')
 
     plotgroup = parser.add_mutually_exclusive_group()
     plotgroup.add_argument('-plots', dest='plotFlag',
