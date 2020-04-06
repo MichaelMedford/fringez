@@ -143,7 +143,7 @@ def test_models(fringe_maps_flattened,
     estimator_names = return_estimator_names()
 
     for name in estimator_names:
-        timestamp = datetime.datetime.now().strftime('%Y%m%d')
+        timestamp = datetime.now().strftime('%Y%m%d')
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
