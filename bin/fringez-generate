@@ -24,7 +24,14 @@ def main():
                            default=6,
                            help='Number of components in the PCA model. '
                                 'DEFAULT 6.')
-    arguments.add_argument('-fringe-model-name', type=str,
+    arguments.add_argument('-n-samples', type=int,
+                           help='Number of samples for PCA training. '
+                                'If set to a number less than the number of images, '
+                                'images are collected into median stacks of approximately '
+                                'equal size and photometric depth '
+                                'prior to training. Otherwise, each sample contains a '
+                                'single image in training. DEFAULT 1.')
+    arguments.add_argument('-fringe-model-name', type=int,
                            default=None,
                            help='If selected, forces the generated fringe '
                                 'models to include this name.')
@@ -40,8 +47,14 @@ def main():
 
     args = parser.parse_args()
 
+    if args.n_samples is None:
+        raise Exception('-n-samples has not been set')
+
+    # Print
+    print('Generating fringez model')
+
     # Generate the fringe model from the fringe images in the directory
-    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps()
+    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps(args.n_samples)
 
     generate_models(fname_arr,
                     fringe_maps_flattened,
