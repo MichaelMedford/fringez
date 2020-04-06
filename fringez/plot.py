@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 """plot.py"""
 import matplotlib.pyplot as plt
-from numpy import ceil as np.ceil
-from numpy import std as np.std
-from numpy import linspace as np.linspace
-from numpy import sqrt as np.sqrt
-from os import path as os.path
+import numpy as np
+import os
 
 
 def plot_gallery(title, images, image_shape):

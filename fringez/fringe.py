@@ -42,10 +42,10 @@ def gather_flat_fringe_maps(N_samples, parallelFlag):
     """Gathers all of the fringe images in the directory,
     flattened for 1D analysis"""
     if parallelFlag:
-        results = gather_fringe_maps_parallel(N_samples)
+        fname_arr, fringes, rcid = gather_fringe_maps_parallel(N_samples)
     else:
-        results = gather_fringe_maps_serial(N_samples)
-    fname_arr, fringes, rcid = results
+        fname_arr, fringes, rcid = gather_fringe_maps_serial(N_samples)
+
     if fringes is not None:
         fringe_maps_flattened, image_shape = flatten_images(fringes)
     else:
