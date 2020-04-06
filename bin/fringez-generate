@@ -35,6 +35,10 @@ def main():
                            default=None,
                            help='If selected, forces the generated fringe '
                                 'models to include this name. DEFAULT None.')
+    arguments.add_argument('-plot-idx', type=int,
+                           default=None,
+                           help='If selected, forces the exapmle debug plot '
+                                'to a specific image in the folder. DEFAULT None.')
 
     plotgroup = parser.add_mutually_exclusive_group()
     plotgroup.add_argument('-plots', dest='plotFlag',
@@ -93,7 +97,8 @@ def main():
                     image_shape,
                     rcid,
                     fringe_model_name=args.fringe_model_name,
-                    n_components=args.n_components)
+                    n_components=args.n_components,
+                    idx=args.plot_idx)
 
 
 if __name__ == '__main__':

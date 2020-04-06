@@ -136,7 +136,7 @@ def test_models(fringe_maps_flattened,
 
     n_samples, n_features = fringe_maps_flattened.shape
 
-    if idx is None:
+    if idx is None or idx > n_samples:
         idx = np.random.choice(np.arange(n_samples))
     fringe_map = fringe_maps_flattened[idx]
 
