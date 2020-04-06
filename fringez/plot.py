@@ -74,7 +74,7 @@ def plot_before_and_after(title, fringe_map, fringe_bias):
     ax[3].set_title('Pixel Histogram')
     ax[3].legend(loc=3)
 
-    fname = '%s/%s.png' % title.replace(' ', '_')
+    fname = '%s.png' % title.replace(' ', '_')
     fig.savefig(fname)
     print('%s saved to disk' % fname)
     plt.close()
