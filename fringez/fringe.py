@@ -38,10 +38,14 @@ def generate_fringe_map(image, mask_image=None):
     return fringe_map, median_absdev
 
 
-def gather_flat_fringe_maps(n_samples):
+def gather_flat_fringe_maps(N_samples, parallelFlag):
     """Gathers all of the fringe images in the directory,
     flattened for 1D analysis"""
-    fname_arr, fringes, rcid = gather_fringe_maps(n_samples)
+    if parallelFlag:
+        results = gather_fringe_maps_parallel(N_samples)
+    else:
+        results = gather_fringe_maps_serial(N_samples)
+    fname_arr, fringes, rcid = results
     if fringes is not None:
         fringe_maps_flattened, image_shape = flatten_images(fringes)
     else:
@@ -230,13 +234,6 @@ def gather_fringe_maps_parallel(N_samples):
             fringe_maps.append(sample_median)
 
     return fringe_filename_arr, fringe_maps, rcid
-
-
-def gather_fringe_maps(N_samples, parallelFlag):
-    if parallelFlag:
-        return gather_fringe_maps_parallel(N_samples)
-    else:
-        return gather_fringe_maps_serial(N_samples)
 
 
 def append_eigenvalues_to_header(header, fringe_ica):
