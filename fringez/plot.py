@@ -25,8 +25,7 @@ def plot_gallery(title, images, image_shape):
         ax[i].set_yticks(())
         ax[i].set_title('Comp %i' % i)
 
-    model_folder = os.path.dirname(os.path.realpath(__file__)) + '/models'
-    fname = '%s/%s.png' % (model_folder, title.replace(' ', '_'))
+    fname = '%s.png' % title.replace(' ', '_')
     fig.savefig(fname)
     print('%s saved to disk' % fname)
     plt.close()
@@ -75,8 +74,7 @@ def plot_before_and_after(title, fringe_map, fringe_bias):
     ax[3].set_title('Pixel Histogram')
     ax[3].legend(loc=3)
 
-    model_folder = os.path.dirname(os.path.realpath(__file__)) + '/models'
-    fname = '%s/%s.png' % (model_folder, title.replace(' ', '_'))
+    fname = '%s/%s.png' % title.replace(' ', '_')
     fig.savefig(fname)
     print('%s saved to disk' % fname)
     plt.close()
