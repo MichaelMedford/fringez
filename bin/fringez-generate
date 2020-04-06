@@ -59,20 +59,26 @@ def main():
 
     args = parser.parse_args()
 
-    if args.n_samples is None:
+    if args.parallelFlag:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+    else:
+        rank = 0
+
+    if args.n_samples is None and rank == 0:
         raise Exception('-n-samples has not been set')
 
-    # Print
-    print('Generating fringez model')
+    if rank == 0:
+        print('Generating fringez model')
 
     # Generate the fringe model from the fringe images in the directory
     fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps(args.n_samples,
                                                                                   args.parallelFlag)
 
-    if fringe_maps_flattened is None:
+    if rank != 0:
         return
     else:
-        print('Saving fringe_maps_flattened')
         import numpy as np
         np.save('fringe_maps_flattened.npy', fringe_maps_flattened)
         return

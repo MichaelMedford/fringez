@@ -33,7 +33,6 @@ def generate_fringe_map(image, mask_image=None):
 
     fringe_map -= median
     fringe_map /= median_absdev
-    fringe_map = fringe_map.astype(np.float32)
 
     return fringe_map, median_absdev
 
@@ -41,16 +40,8 @@ def generate_fringe_map(image, mask_image=None):
 def gather_flat_fringe_maps(N_samples, parallelFlag):
     """Gathers all of the fringe images in the directory,
     flattened for 1D analysis"""
-    if parallelFlag:
-        fname_arr, fringes, rcid = gather_fringe_maps_parallel(N_samples)
-    else:
-        fname_arr, fringes, rcid = gather_fringe_maps_serial(N_samples)
-
-    if fringes is not None:
-        fringe_maps_flattened, image_shape = flatten_images(fringes)
-    else:
-        fringe_maps_flattened = None
-        image_shape = None
+    fname_arr, fringes, rcid = gather_fringe_maps(N_samples, parallelFlag)
+    fringe_maps_flattened, image_shape = flatten_images(fringes)
     return fname_arr, fringe_maps_flattened, image_shape, rcid
 
 
@@ -140,11 +131,14 @@ def gather_fringe_maps_serial(N_samples):
     return fringe_filename_arr, fringe_maps, rcid
 
 
-def gather_fringe_maps_parallel(N_samples):
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+def gather_fringe_maps(N_samples, parallelFlag):
+    if parallelFlag:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+        size = comm.Get_size()
+    else:
+        rank, size = 0, 1
 
     if rank == 0:
         # Only select images currently on disk
@@ -187,9 +181,10 @@ def gather_fringe_maps_parallel(N_samples):
         fringe_maps = None
         rcid = None
 
-    fringe_filename_arr = comm.bcast(fringe_filename_arr, root=0)
-    image_shape = comm.bcast(image_shape, root=0)
-    N_images = len(fringe_filename_arr)
+    if parallelFlag:
+        fringe_filename_arr = comm.bcast(fringe_filename_arr, root=0)
+        image_shape = comm.bcast(image_shape, root=0)
+        N_images = len(fringe_filename_arr)
 
     for id_sample in range(N_samples):
         if rank == 0 and id_sample % 10 == 0:
@@ -221,14 +216,17 @@ def gather_fringe_maps_parallel(N_samples):
             my_sample[i] = fringe_map
             del data_fringe, fringe_map
 
-        sizes = [len(a) * image_shape[0] * image_shape[1] for a in np.array_split(idx_sample, size)]
-        displacements_input = np.insert(np.cumsum(sizes), 0, 0)[0:-1]
+        if parallelFlag:
+            sizes = [len(a) * image_shape[0] * image_shape[1] for a in np.array_split(idx_sample, size)]
+            displacements_input = np.insert(np.cumsum(sizes), 0, 0)[0:-1]
 
-        if rank == 0:
-            sample = np.zeros((len(idx_sample), image_shape[0], image_shape[1]))
+            if rank == 0:
+                sample = np.zeros((len(idx_sample), image_shape[0], image_shape[1]))
+            else:
+                sample = None
+            comm.Gatherv(my_sample, [sample, sizes, displacements_input, MPI.DOUBLE], root=0)
         else:
-            sample = None
-        comm.Gatherv(my_sample, [sample, sizes, displacements_input, MPI.DOUBLE], root=0)
+            sample = my_sample
 
         if rank == 0:
             sample_median = np.median(sample, axis=0)

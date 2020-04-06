@@ -9,6 +9,10 @@ from astropy.io import fits
 def flatten_images(images):
     """Flattens images for use in 1D analysis"""
 
+    # If parallelFlag and non-root rank is passing in None
+    if images is None:
+        return None
+
     image_shape = images[0].shape
     images_flattened = []
     for i, image in enumerate(images):
