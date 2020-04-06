@@ -42,11 +42,15 @@ def gather_flat_fringe_maps(n_samples):
     """Gathers all of the fringe images in the directory,
     flattened for 1D analysis"""
     fname_arr, fringes, rcid = gather_fringe_maps(n_samples)
-    fringe_maps_flattened, image_shape = flatten_images(fringes)
+    if fringes is not None:
+        fringe_maps_flattened, image_shape = flatten_images(fringes)
+    else:
+        fringe_maps_flattened = None
+        image_shape = None
     return fname_arr, fringe_maps_flattened, image_shape, rcid
 
 
-def gather_fringe_maps(N_samples):
+def gather_fringe_maps_serial(N_samples):
     """
     Gathers all of the science images in the directory and returns a list
     of the fringe maps, as well as the rcid of the science images.
@@ -130,6 +134,109 @@ def gather_fringe_maps(N_samples):
         fringe_maps.append(sample_median)
 
     return fringe_filename_arr, fringe_maps, rcid
+
+
+def gather_fringe_maps_parallel(N_samples):
+    from mpi4py import MPI
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
+
+    if rank == 0:
+        # Only select images currently on disk
+        data = np.genfromtxt('fringe_maglimits.txt', delimiter=',', names=True,
+                             dtype=None, encoding='utf-8')
+        fringe_filename_arr = []
+        maglimit_arr = []
+        for fringe_filename, maglimit in data:
+            if os.path.exists(fringe_filename):
+                fringe_filename_arr.append(fringe_filename)
+                maglimit_arr.append(maglimit)
+        fringe_filename_arr = np.array(fringe_filename_arr)
+        maglimit_arr = np.array(maglimit_arr)
+        N_images = len(fringe_filename_arr)
+
+        # Sort in ascending maglim order
+        maglimit_idxs = np.argsort(maglimit_arr)
+        fringe_filename_arr = fringe_filename_arr[maglimit_idxs]
+
+        # Determine the rcid of the folder
+        ccdid = int(fringe_filename_arr[0].split('_')[-4].replace('c', ''))
+        qid = int(fringe_filename_arr[0].split('_')[-2].replace('q', ''))
+        rcid = (ccdid - 1) * 4 + (qid - 1)
+        print('rcid = %i' % rcid)
+
+        # Determine the image_shape
+        with fits.open(fringe_filename_arr[0]) as f:
+            image_shape = f[0].data.shape
+
+        # Calculate the size of the samples
+        N_images_per_sample = int(N_images / N_samples)
+        print('%i image on disk | %i samples -> ~%i images per sample' % (N_images,
+                                                                          N_samples,
+                                                                          N_images_per_sample))
+
+        fringe_maps = []
+    else:
+        fringe_filename_arr = None
+        image_shape = None
+        fringe_maps = None
+
+    fringe_filename_arr = comm.bcast(fringe_filename_arr, root=0)
+    image_shape = comm.bcast(image_shape, root=0)
+    N_images = len(fringe_filename_arr)
+
+    for id_sample in range(N_samples):
+        if rank == 0 and id_sample % 10 == 0:
+            print('Generating fringe sample %i/%i' % (id_sample, N_samples))
+
+        idx_sample = np.arange(id_sample, N_images, N_samples).astype(int)
+        my_idx_sample = np.array_split(idx_sample, size)[rank]
+
+        my_sample = np.zeros((len(my_idx_sample), image_shape[0], image_shape[1]))
+
+        for i, idx in enumerate(my_idx_sample):
+            fringe_filename = fringe_filename_arr[idx]
+            with fits.open(fringe_filename) as f:
+                data_fringe = f[0].data
+            if data_fringe.shape != image_shape:
+                print('%s != %s' % (str(fringe_map.shape), str(image_shape)))
+                print('** ALL FRINGE MAPS MUST BE THE SAME SIZE **')
+                print('** EXITING **')
+                sys.exit(0)
+
+            mskimg_filepath = fringe_filename.replace('sciimg', 'mskimg')
+            if os.path.exists(mskimg_filepath):
+                with fits.open(mskimg_filepath) as f:
+                    data_mskimg = f[0].data
+            else:
+                data_mskimg = None
+
+            fringe_map, _ = generate_fringe_map(data_fringe, mask_image=data_mskimg)
+            my_sample[i] = fringe_map
+            del data_fringe, fringe_map
+
+        sizes = [len(a) * image_shape[0] * image_shape[1] for a in np.array_split(idx_sample, size)]
+        displacements_input = np.insert(np.cumsum(sizes), 0, 0)[0:-1]
+
+        if rank == 0:
+            sample = np.zeros((len(idx_sample), image_shape[0], image_shape[1]))
+        else:
+            sample = None
+        comm.Gatherv(my_sample, [sample, sizes, displacements_input, MPI.DOUBLE], root=0)
+
+        if rank == 0:
+            sample_median = np.median(sample, axis=0)
+            fringe_maps.append(sample_median)
+
+    return fringe_filename_arr, fringe_maps, rcid
+
+
+def gather_fringe_maps(N_samples, parallelFlag):
+    if parallelFlag:
+        return gather_fringe_maps_parallel(N_samples)
+    else:
+        return gather_fringe_maps_serial(N_samples)
 
 
 def append_eigenvalues_to_header(header, fringe_ica):

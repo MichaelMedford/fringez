@@ -45,6 +45,18 @@ def main():
                            help='Turn OFF plotting for debugging. DEFAULT.')
     parser.set_defaults(plotFlag=False)
 
+    parallelgroup = parser.add_mutually_exclusive_group()
+    parallelgroup.add_argument('-single', dest='parallelFlag',
+                               action='store_false',
+                               help='Run in single mode. DEFAULT.')
+    parallelgroup.add_argument('-parallel', dest='parallelFlag',
+                               action='store_true',
+                               help='Run in parallel mode. This is '
+                                    'recommended when selecting '
+                                    '-n-samples less than the number of images. '
+                                    'Requires mpi4py.')
+    parser.set_defaults(parallelFlag=False)
+
     args = parser.parse_args()
 
     if args.n_samples is None:
@@ -54,7 +66,11 @@ def main():
     print('Generating fringez model')
 
     # Generate the fringe model from the fringe images in the directory
-    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps(args.n_samples)
+    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps(args.n_samples,
+                                                                                  args.parallelFlag)
+
+    if fringe_maps_flattened is None:
+        return
 
     generate_models(fname_arr,
                     fringe_maps_flattened,
