@@ -11,7 +11,7 @@ def flatten_images(images):
 
     # If parallelFlag and non-root rank is passing in None
     if images is None:
-        return None
+        return None, None
 
     image_shape = images[0].shape
     images_flattened = []
