@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 """plot.py"""
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.use('agg')
 import numpy as np
-import os
 
 
 def plot_gallery(title, images, image_shape):
