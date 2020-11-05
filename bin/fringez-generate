@@ -37,7 +37,7 @@ def main():
                                 'models to include this name. DEFAULT None.')
     arguments.add_argument('-plot-idx', type=int,
                            default=None,
-                           help='If selected, forces the exapmle debug plot '
+                           help='If selected, forces the example debug plot '
                                 'to a specific image in the folder. DEFAULT None.')
 
     plotgroup = parser.add_mutually_exclusive_group()
