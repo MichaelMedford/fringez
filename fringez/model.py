@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 """model.py"""
-from numpy import random as np_random
-from numpy import arange as np_arange
+import numpy as np
 from sklearn import decomposition
 from time import time
 from datetime import datetime
-from os import path as os_path
-from shutil import move as shutil_move
-from numpy import savez as np_savez
-from numpy import load as np_load
+import os
+import shutil
 from fringez.plot import plot_before_and_after
 from fringez.plot import plot_gallery
 from fringez.fringe import calculate_fringe_bias
@@ -103,11 +100,11 @@ def generate_models(fname_arr,
         train_time = (time() - t0)
         print("Fitting Model: done in %0.3fs" % train_time)
 
-        np_savez(model_name,
+        np.savez(model_name,
                  mean=estimator.mean_,
                  components=estimator.components_,
                  explained_variance=estimator.explained_variance_)
-        shutil_move(model_name + '.npz', model_name + '.model')
+        shutil.move(model_name + '.npz', model_name + '.model')
         print('Fringe Model saved as: %s.model' % model_name)
 
         log_name = model_name + '.model_list'
@@ -139,14 +136,14 @@ def test_models(fringe_maps_flattened,
 
     n_samples, n_features = fringe_maps_flattened.shape
 
-    if idx is None:
-        idx = np_random.choice(np_arange(n_samples), 1).astype(int)[0]
+    if idx is None or idx > n_samples:
+        idx = np.random.choice(np.arange(n_samples))
     fringe_map = fringe_maps_flattened[idx]
 
     estimator_names = return_estimator_names()
 
     for name in estimator_names:
-        timestamp = datetime.datetime.now().strftime('%Y%m%d')
+        timestamp = datetime.now().strftime('%Y%m%d')
 
         cid = int(rcid / 4) + 1
         qid = int(rcid % 4) + 1
@@ -168,7 +165,7 @@ def test_models(fringe_maps_flattened,
                                                     timestamp)
         print('Working on %s...' % name)
 
-        fringe_model = np_load(model_name)
+        fringe_model = np.load(model_name)
 
         t0 = time()
         fringe_bias, _ = calculate_fringe_bias(fringe_map, fringe_model)
@@ -177,7 +174,7 @@ def test_models(fringe_maps_flattened,
         print("Building fringe bias from %s: done in %0.3fs" % (name,
                                                                 model_time))
 
-        model_name = os_path.basename(model_name)
+        model_name = os.path.basename(model_name)
         model_name = model_name.replace('.model', '')
         title = '%s idx%i fringe map vs fringe bias' % (model_name, idx)
         plot_before_and_after(title,

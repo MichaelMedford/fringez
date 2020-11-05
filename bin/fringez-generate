@@ -24,10 +24,21 @@ def main():
                            default=6,
                            help='Number of components in the PCA model. '
                                 'DEFAULT 6.')
+    arguments.add_argument('-n-samples', type=int,
+                           help='Number of samples for PCA training. '
+                                'If set to a number less than the number of images, '
+                                'images are collected into median stacks of approximately '
+                                'equal size and photometric depth '
+                                'prior to training. Otherwise, each sample contains a '
+                                'single image in training. DEFAULT 1.')
     arguments.add_argument('-fringe-model-name', type=str,
                            default=None,
                            help='If selected, forces the generated fringe '
-                                'models to include this name.')
+                                'models to include this name. DEFAULT None.')
+    arguments.add_argument('-plot-idx', type=int,
+                           default=None,
+                           help='If selected, forces the example debug plot '
+                                'to a specific image in the folder. DEFAULT None.')
 
     plotgroup = parser.add_mutually_exclusive_group()
     plotgroup.add_argument('-plots', dest='plotFlag',
@@ -38,10 +49,39 @@ def main():
                            help='Turn OFF plotting for debugging. DEFAULT.')
     parser.set_defaults(plotFlag=False)
 
+    parallelgroup = parser.add_mutually_exclusive_group()
+    parallelgroup.add_argument('-single', dest='parallelFlag',
+                               action='store_false',
+                               help='Run in single mode. DEFAULT.')
+    parallelgroup.add_argument('-parallel', dest='parallelFlag',
+                               action='store_true',
+                               help='Run in parallel mode. This is '
+                                    'recommended when selecting '
+                                    '-n-samples less than the number of images. '
+                                    'Requires mpi4py.')
+    parser.set_defaults(parallelFlag=False)
+
     args = parser.parse_args()
 
+    if args.parallelFlag:
+        from mpi4py import MPI
+        comm = MPI.COMM_WORLD
+        rank = comm.Get_rank()
+    else:
+        rank = 0
+
+    if args.n_samples is None and rank == 0:
+        raise Exception('-n-samples has not been set')
+
+    if rank == 0:
+        print('Generating fringez model')
+
     # Generate the fringe model from the fringe images in the directory
-    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps()
+    fname_arr, fringe_maps_flattened, image_shape, rcid = gather_flat_fringe_maps(args.n_samples,
+                                                                                  args.parallelFlag)
+
+    if rank != 0:
+        return
 
     generate_models(fname_arr,
                     fringe_maps_flattened,
@@ -57,7 +97,8 @@ def main():
                     image_shape,
                     rcid,
                     fringe_model_name=args.fringe_model_name,
-                    n_components=args.n_components)
+                    n_components=args.n_components,
+                    idx=args.plot_idx)
 
 
 if __name__ == '__main__':
