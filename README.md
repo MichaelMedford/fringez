@@ -171,4 +171,4 @@ the images that went into the creation of the model.
 * Peter Nugent <penugent@lbl.gov>
 
 ## Citation
-[![DOI](https://zenodo.org/badge/206685101.svg)](https://zenodo.org/badge/latestdoi/206685101)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4247698.svg)](https://doi.org/10.5281/zenodo.4247698)
