@@ -51,7 +51,7 @@ The script will also download the model lists, containing the list of images
 used to create the fringe model. 
 
 Current model versions:
-* 20190907 (16 GB)
+* 20200723 (16 GB)
 
 Fringe models can either be downloaded for all 64 readout channels with the 
 ```-all``` argument, or only a single fringe model can be downloaded with 
