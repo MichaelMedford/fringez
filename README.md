@@ -12,7 +12,7 @@ when subtraction from the i-band image, removes the atmospheric fringes.
 This results in a clean i-band image.  
 
 **Diagram of fringez Scripts**
-![](https://raw.githubusercontent.com/MichaelMedford/fringez/master/figures/fringez_diagram.jpeg)
+![](https://github.com/MichaelMedford/fringez/raw/master/figures/fringez_diagram.jpeg)
 
 ```fringez``` installs three executables.
 
@@ -122,7 +122,7 @@ images to qualitatively show how UBI scales with the presence of
 atmospheric fringes.
 
 **Ideal UBI and Example Images**
-![](https://raw.githubusercontent.com/MichaelMedford/fringez/master/figures/UBI_apertures_and_examples.jpeg)
+![](https://github.com/MichaelMedford/fringez/raw/master/figures/UBI_apertures_and_examples.png)
 
 To measure the UBI on an image:
 
