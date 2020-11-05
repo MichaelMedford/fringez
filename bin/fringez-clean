@@ -25,7 +25,7 @@ def return_image_cid_qid(image):
     return cid, qid
 
 
-def return_fringe_model(image, fringe_model_folder):
+def return_fringe_model_name(image, fringe_model_folder):
     model_prefix, model_suffix = return_model_template(fringe_model_folder)
     cid, qid = return_image_cid_qid(image)
 
@@ -110,8 +110,8 @@ def main():
         # Subtract the fringe model to all science images in the directory
         print('*** -all-images-in-folder selected, cleaning all images '
               'in the current directory')
-        images = glob.glob('ztf*sciimg.fits')
-        images.sort()
+        image_names = glob.glob('ztf*sciimg.fits')
+        image_names.sort()
 
         if args.parallelFlag:
             from mpi4py import MPI
@@ -120,20 +120,20 @@ def main():
             size = comm.Get_size()
 
             idx = rank
-            while idx < len(images):
-                image = images[idx]
-                fringe_model = return_fringe_model(image,
-                                                   args.fringe_model_folder)
-                remove_fringe(image_name=image,
-                              fringe_model_name=fringe_model,
+            while idx < len(image_names):
+                image_name = image_names[idx]
+                fringe_model_name = return_fringe_model_name(
+                    image_name, args.fringe_model_folder)
+                remove_fringe(image_name=image_name,
+                              fringe_model_name=fringe_model_name,
                               debugFlag=args.debugFlag)
                 idx += size
         else:
-            for image in images:
-                fringe_model = return_fringe_model(image,
-                                                   args.fringe_model_folder)
-                remove_fringe(image_name=image,
-                              fringe_model_name=fringe_model,
+            for image_name in image_names:
+                fringe_model_name = return_fringe_model_name(
+                    image_name, args.fringe_model_folder)
+                remove_fringe(image_name=image_name,
+                              fringe_model_name=fringe_model_name,
                               debugFlag=args.debugFlag)
     else:
         # Subtract the fringe model from the --image-name science image
