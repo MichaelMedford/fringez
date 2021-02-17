@@ -5,6 +5,7 @@ import glob
 import os
 import shutil
 from astropy.io import fits
+import shutil
 
 
 def flatten_images(images):

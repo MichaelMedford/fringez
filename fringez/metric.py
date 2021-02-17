@@ -26,7 +26,7 @@ def return_backgrounds(image, mask, mskimg_fname, saveBackground=True):
             create_fits(rms_fname, rms)
     return rms
 
-
+  
 def load_image_and_mask(sciimg_fname, mskimg_fname):
     with fits.open(sciimg_fname) as f:
         image = f[0].data
@@ -35,8 +35,6 @@ def load_image_and_mask(sciimg_fname, mskimg_fname):
     with fits.open(mskimg_fname) as f:
         mask = f[0].data
     mask = mask.astype(bool)
-
-    return image, image_header, mask
 
 
 def return_aperture_locations(mask, N_apertures=50000, aperture_size=2,

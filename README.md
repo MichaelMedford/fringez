@@ -12,7 +12,7 @@ when subtraction from the i-band image, removes the atmospheric fringes.
 This results in a clean i-band image.  
 
 **Diagram of fringez Scripts**
-![](https://raw.githubusercontent.com/MichaelMedford/fringez/master/fringez_diagram.jpeg)
+![](https://github.com/MichaelMedford/fringez/raw/master/figures/fringez_diagram.jpeg)
 
 ```fringez``` installs three executables.
 
@@ -51,7 +51,7 @@ The script will also download the model lists, containing the list of images
 used to create the fringe model. 
 
 Current model versions:
-* 20190907 (16 GB)
+* 20200723 (32 GB)
 
 Fringe models can either be downloaded for all 64 readout channels with the 
 ```-all``` argument, or only a single fringe model can be downloaded with 
@@ -108,9 +108,35 @@ execute ```fringez-clean -single-image -image-name={IMAGE_NAME}
 ```-fringe-model-name``` arguments must be set when ```-single-image``` is 
 selected.  
 
+### Measuring the Uniform Background Indicator (UBI)
+The presence of correlated background noise can be determined by measuring 
+the Uniform Background Indicator, or UBI, or an image. The measurement is made 
+by performing aperture photometry on random background locations and measuring 
+how well the scatter in background flux measurements is captured by locally 
+determined estimates of the flux error. 
+
+An ideal `UBI = 1` indicates no correlated background noise, with larger values 
+indicating more correlated noise. Here are the results of calculating UBI on 
+an image of random noise for various aperture sizes, as well as three example 
+images to qualitatively show how UBI scales with the presence of 
+atmospheric fringes.
+
+**Ideal UBI and Example Images**
+![](https://github.com/MichaelMedford/fringez/raw/master/figures/UBI_apertures_and_examples.png)
+
+To measure the UBI on an image:
+
+```python
+from fringez.metric import calculate_UBI
+UBI, UBI_err = calculate_UBI(sciimg_fname, mskimg_fname, updateHeader=True)
+```
+
+The science image header will be updated with the value of the image's UBI.
+
 ### Generating Fringe Models
 *Note: Downloading pre-generated models using the fringez-download executable 
-is recommended. Most users will not need to generate new fringe models*
+is recommended. Most users will not need to generate new fringe models. New 
+models must be generated from images that have not already been cleaned.*
 
 Fringe models are generated with the ```fringez-generate``` executable.
 
@@ -145,4 +171,4 @@ the images that went into the creation of the model.
 * Peter Nugent <penugent@lbl.gov>
 
 ## Citation
-[![DOI](https://zenodo.org/badge/206685101.svg)](https://zenodo.org/badge/latestdoi/206685101)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4247698.svg)](https://doi.org/10.5281/zenodo.4247698)
