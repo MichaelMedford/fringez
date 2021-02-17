@@ -8,7 +8,7 @@ for generating fringez models and cleaning images with those models.
 """
 import argparse
 import glob
-from fringez.convert import convert_image
+from fringez.convert import lcogt_convert_image
 
 
 def main():
@@ -29,7 +29,7 @@ def main():
         image_names = glob.glob('*fits.fz')
         image_names.sort()
         for image_name in image_names:
-            convert_image(image_name, lcogtFlag=True)
+            lcogt_convert_image(image_name)
 
 
 if __name__ == '__main__':

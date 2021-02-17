@@ -41,8 +41,3 @@ def lcogt_convert_image(image_name):
         mask_data = f[3].data  # zero for background pixel, non-zero for everything else
         mask_name = image_name.replace('.fits.fz', '-mskimg.fits')
         create_fits(mask_name, mask_data)
-
-
-def convert_image(image_name, lcogtFlag=False):
-    if lcogtFlag:
-        lcogt_convert_image(image_name)
