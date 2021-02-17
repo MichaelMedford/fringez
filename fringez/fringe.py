@@ -166,7 +166,7 @@ def calculate_fringe_bias(fringe_map, fringe_model):
     transform and inverse transform methods.
 
     Models are loaded from disk as
-    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
+    fringez_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
 
     fringe_map = fringe_map.flatten()
     fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))
