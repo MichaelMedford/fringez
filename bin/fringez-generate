@@ -24,7 +24,7 @@ def main():
                            default=6,
                            help='Number of components in the PCA model. '
                                 'DEFAULT 6.', required=False)
-    arguments.add_argument('--n-samples', type=int,
+    arguments.add_argument('--n-samples', type=int, default=1,
                            help='Number of samples for PCA training. '
                                 'If set to a number less than the number of images, '
                                 'images are collected into median stacks of approximately '
