@@ -23,22 +23,22 @@ def main():
     arguments.add_argument('--n-components', type=int,
                            default=6,
                            help='Number of components in the PCA model. '
-                                'DEFAULT 6.')
+                                'DEFAULT 6.', required=False)
     arguments.add_argument('--n-samples', type=int,
                            help='Number of samples for PCA training. '
                                 'If set to a number less than the number of images, '
                                 'images are collected into median stacks of approximately '
                                 'equal size and photometric depth '
                                 'prior to training. Otherwise, each sample contains a '
-                                'single image in training. DEFAULT 1.')
+                                'single image in training. DEFAULT 1.', required=False)
     arguments.add_argument('--fringe-model-name', type=str,
                            default=None,
                            help='If selected, forces the generated fringe '
-                                'models to include this name. DEFAULT None.')
+                                'models to include this name. DEFAULT None.', required=False)
     arguments.add_argument('--plot-idx', type=int,
                            default=None,
                            help='If selected, forces the example debug plot '
-                                'to a specific image in the folder. DEFAULT None.')
+                                'to a specific image in the folder. DEFAULT None.', required=False)
 
     plotgroup = parser.add_mutually_exclusive_group()
     plotgroup.add_argument('--plots', dest='plotFlag',
