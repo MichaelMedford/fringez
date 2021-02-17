@@ -3,6 +3,7 @@
 import numpy as np
 import glob
 import os
+import shutil
 from astropy.io import fits
 import shutil
 
@@ -83,7 +84,7 @@ def update_fits(image_name,
     fits.writeto(image_tmp,
                  data,
                  header,
-                 clobber=True)
+                 overwrite=True)
 
     # Remove the original image
     if os.path.exists(image_name):
