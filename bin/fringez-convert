@@ -1,0 +1,36 @@
+#!/usr/bin/env python3
+
+"""
+fringez-convert :
+
+Converts images in the current folder into the format needed
+for generating fringez models and cleaning images with those models.
+"""
+import argparse
+import glob
+from fringez.convert import convert_image
+
+
+def main():
+    """Converts images in the current folder into the format needed for fringez."""
+
+    # Get arguments
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    instrument = parser.add_argument_group('instrument')
+    instrument.add_argument('--LCOGT', dest='lcogt', action='store_true',
+                            help='Convert Las Cumbres Observatory Global Telescope images',
+                            default=False)
+
+    args = parser.parse_args()
+
+    if args.lcogt:
+        image_names = glob.glob('*fits.fz')
+        image_names.sort()
+        for image_name in image_names:
+            convert_image(image_name, lcogtFlag=True)
+
+
+if __name__ == '__main__':
+    main()
