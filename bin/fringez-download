@@ -47,19 +47,19 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
 
     arguments = parser.add_argument_group('arguments')
-    arguments.add_argument('-fringe-model-date', type=str,
+    arguments.add_argument('--fringe-model-date', type=str,
                            help='Model date for downloading pre-generated '
                                 'models from the NERSC web portal. See '
                                 'fringez github page for list of available '
                                 'model dates.',
                            required=True)
-    arguments.add_argument('-fringe-model-folder', type=str,
+    arguments.add_argument('--fringe-model-folder', type=str,
                            help='Models are downloaded by default into the '
                                 'current directory. -fringe-model-folder will '
                                 'direct the models to be downloaded to this '
                                 'folder instead.',
                            default='.')
-    arguments.add_argument('-fringe-model-id', type=str,
+    arguments.add_argument('--fringe-model-id', type=str,
                            help='If -single is selected, only the fringe '
                                 'model containing the -fringe-model-id is'
                                 ' downloaded from the NERSC web portal. The '
@@ -68,11 +68,11 @@ def main():
                                 'syntax: c01_q1')
 
     allgroup = parser.add_mutually_exclusive_group()
-    allgroup.add_argument('-all', dest='allFlag',
+    allgroup.add_argument('--all', dest='allFlag',
                           action='store_true',
                           help='Download all fringe models in the '
                                '-fringe-model-date directory. DEFAULT.')
-    allgroup.add_argument('-single', dest='allFlag',
+    allgroup.add_argument('--single', dest='allFlag',
                           action='store_false',
                           help='Download only a single fringe model from the '
                                '-fringe-model-date directory. Requires '
@@ -82,7 +82,7 @@ def main():
     args = parser.parse_args()
 
     if not args.allFlag and not args.fringe_model_id:
-        print('-fringe-model-id must be set if -single is selected')
+        print('--fringe-model-id must be set if --single is selected')
         sys.exit(0)
 
     if args.allFlag:

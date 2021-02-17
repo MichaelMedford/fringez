@@ -43,47 +43,47 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
 
     allArguments = parser.add_argument_group('arguments for '
-                                             '-all-images-in-folder')
-    allArguments.add_argument('-fringe-model-folder', type=str,
+                                             '---all-images-in-folder')
+    allArguments.add_argument('--fringe-model-folder', type=str,
                               help='Folder that contains all fringe models.')
 
     notAllArguments = parser.add_argument_group('arguments for -single-image')
-    notAllArguments.add_argument('-image-name', type=str,
+    notAllArguments.add_argument('--image-name', type=str,
                                  help='Filename of science image.')
-    notAllArguments.add_argument('-fringe-model-name', type=str,
+    notAllArguments.add_argument('--fringe-model-name', type=str,
                                  help='Filename of fringe model.')
 
     allgroup = parser.add_mutually_exclusive_group()
-    allgroup.add_argument('-all-images-in-folder', dest='allFlag',
+    allgroup.add_argument('--all-images-in-folder', dest='allFlag',
                           action='store_true',
                           help='Clean all images in the current folder. '
                                'Selecting this parameter requires setting '
                                '-fringe-model-folder. DEFAULT.')
-    allgroup.add_argument('-single-image', dest='allFlag',
+    allgroup.add_argument('--single-image', dest='allFlag',
                           action='store_false',
                           help='Clean a single image. Selecting '
                                'this parameter requires setting '
-                               '-image-name and -fringe-model-name.')
+                               '--image-name and --fringe-model-name.')
     parser.set_defaults(allFlag=True)
 
     plotgroup = parser.add_mutually_exclusive_group()
-    plotgroup.add_argument('-debug', dest='debugFlag',
+    plotgroup.add_argument('--debug', dest='debugFlag',
                            action='store_true',
                            help='Do save fringe image to disk.')
-    plotgroup.add_argument('-debug-off', dest='debugFlag',
+    plotgroup.add_argument('--debug-off', dest='debugFlag',
                            action='store_false',
                            help='Do NOT save fringe image to disk. DEFAULT.')
     parser.set_defaults(debugFlag=False)
 
     parallelgroup = parser.add_mutually_exclusive_group()
-    parallelgroup.add_argument('-single', dest='parallelFlag',
+    parallelgroup.add_argument('--single', dest='parallelFlag',
                                action='store_false',
                                help='Run in single mode. DEFAULT.')
-    parallelgroup.add_argument('-parallel', dest='parallelFlag',
+    parallelgroup.add_argument('--parallel', dest='parallelFlag',
                                action='store_true',
                                help='Run in parallel mode. This is '
                                     'recommended when selecting '
-                                    '-all-images-in-folder. Requires mpi4py.')
+                                    '--all-images-in-folder. Requires mpi4py.')
     parser.set_defaults(parallelFlag=False)
 
     args = parser.parse_args()
@@ -92,23 +92,23 @@ def main():
         reqs = subprocess.check_output([sys.executable, '-m', 'pip', 'freeze'])
         installed_packages = [r.decode().split('==')[0] for r in reqs.split()]
         if 'mpi4py' not in installed_packages:
-            print('mpi4py must be installed to use -parallel mode.')
+            print('mpi4py must be installed to use --parallel mode.')
             sys.exit(0)
 
     if args.allFlag:
         if not args.fringe_model_folder:
-            print('-fringe-model-folder must be set when '
-                  '-all-images-in-folder is selected.')
+            print('--fringe-model-folder must be set when '
+                  '--all-images-in-folder is selected.')
             return
     else:
         if not args.image_name or not args.fringe_model_name:
-            print('-image-name and -fringe-model-name must be set when '
-                  '-single-image is selected.')
+            print('--image-name and --fringe-model-name must be set when '
+                  '--single-image is selected.')
             return
 
     if args.allFlag:
         # Subtract the fringe model to all science images in the directory
-        print('*** -all-images-in-folder selected, cleaning all images '
+        print('*** --all-images-in-folder selected, cleaning all images '
               'in the current directory')
         image_names = glob.glob('ztf*sciimg.fits')
         image_names.sort()
@@ -137,7 +137,7 @@ def main():
                               debugFlag=args.debugFlag)
     else:
         # Subtract the fringe model from the --image-name science image
-        print('*** -single-image selected, cleaning a single image')
+        print('*** --single-image selected, cleaning a single image')
         remove_fringe(image_name=args.image_name,
                       fringe_model_name=args.fringe_model_name,
                       debugFlag=args.debugFlag)

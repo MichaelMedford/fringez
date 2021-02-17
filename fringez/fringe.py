@@ -4,6 +4,7 @@ from astropy.io import fits
 import numpy as np
 import sys
 import os
+import glob
 from fringez.utils import create_fits
 from fringez.utils import flatten_images
 
@@ -56,14 +57,12 @@ def gather_fringe_maps(N_samples, parallelFlag):
 
     if rank == 0:
         # Only select images currently on disk
-        data = np.genfromtxt('fringe_maglimits.txt', delimiter=',', names=True,
-                             dtype=None, encoding='utf-8')
-        fringe_filename_arr = []
+        fringe_filename_arr = glob.glob('ztf*sciimg*fits')
+        fringe_filename_arr.sort()
         maglimit_arr = []
-        for fringe_filename, maglimit in data:
-            if os.path.exists(fringe_filename):
-                fringe_filename_arr.append(fringe_filename)
-                maglimit_arr.append(maglimit)
+        for fringe_filename in fringe_filename_arr:
+            with fits.open(fringe_filename) as f:
+                maglimit_arr.append(f[0].header['MAGLIM'])
         fringe_filename_arr = np.array(fringe_filename_arr)
         maglimit_arr = np.array(maglimit_arr)
         N_images = len(fringe_filename_arr)
