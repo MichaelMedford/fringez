@@ -3,6 +3,7 @@
 import numpy as np
 import glob
 import os
+import shutil
 from astropy.io import fits
 
 
@@ -45,6 +46,51 @@ def create_fits(image_name,
 
     # Write the fits image to disk
     hdu.writeto(image_name)
+
+
+def update_fits(image_name,
+                data=None,
+                header=None):
+    """Safely replaces a fits image with new data and/or header
+
+    Uses the astropy.io.fits pacakge. astropy.io.fits.writeto contains a
+    clobber parameter which should allow replacement of one fits file by
+    another of the same name with new data(s) and/or header(s). However if the
+    rewrite is interupted then the original file is lost as well. This method
+    eliminates this risk by guaranteeing that there is always a time where the
+    original data is still safely on disk.
+
+    Args:
+        image_name : str
+            Name of the image.
+        data : numpy.ndarray
+            2-dimensional array of 'float' or 'int'.
+        header : astropy.io.fits.header.Header
+            Header of the fits image.
+
+    Returns:
+        None
+
+    """
+
+    if data is None and header is None:
+        with fits.open(image_name) as f:
+            data = f[0].data
+            header = f[0].header
+
+    # Write the fits image to a temporary file
+    image_tmp = image_name.replace("fits", "fits.tmp")
+    fits.writeto(image_tmp,
+                 data,
+                 header,
+                 overwrite=True)
+
+    # Remove the original image
+    if os.path.exists(image_name):
+        os.remove(image_name)
+
+    # Rename the temporary image name to the original image name
+    shutil.move(image_tmp, image_name)
 
 
 def generate_random_ds9_list(n_random=6):
