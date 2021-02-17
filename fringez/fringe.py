@@ -82,6 +82,8 @@ def gather_fringe_maps(N_samples, parallelFlag):
             image_shape = f[0].data.shape
 
         # Calculate the size of the samples
+        if N_samples is None:
+            N_samples = N_images
         N_images_per_sample = int(N_images / N_samples)
         print('%i image on disk | %i samples -> ~%i images per sample' % (N_images,
                                                                           N_samples,
