@@ -44,40 +44,43 @@ def main():
     """Download pre-generated fringe models from the NERSC web portal."""
 
     # Get arguments
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     arguments = parser.add_argument_group('arguments')
     arguments.add_argument('--fringe-model-date', type=str,
                            help='Model date for downloading pre-generated '
                                 'models from the NERSC web portal. See '
                                 'fringez github page for list of available '
-                                'model dates.',
+                                'model dates.', default='20200723',
                            required=True)
     arguments.add_argument('--fringe-model-folder', type=str,
                            help='Models are downloaded by default into the '
-                                'current directory. -fringe-model-folder will '
+                                'current directory. --fringe-model-folder will '
                                 'direct the models to be downloaded to this '
-                                'folder instead.',
-                           default='.')
-    arguments.add_argument('--fringe-model-id', type=str,
-                           help='If -single is selected, only the fringe '
-                                'model containing the -fringe-model-id is'
-                                ' downloaded from the NERSC web portal. The '
-                                '-fringe-model-id is the cid and the qid of '
-                                'the fringe model combined in the following '
-                                'syntax: c01_q1')
+                                'folder instead.', default='.')
 
-    allgroup = parser.add_mutually_exclusive_group()
+    allorone = parser.add_argument_group('all or single')
+    allgroup = allorone.add_mutually_exclusive_group()
     allgroup.add_argument('--all', dest='allFlag',
                           action='store_true',
                           help='Download all fringe models in the '
-                               '-fringe-model-date directory. DEFAULT.')
+                               '--fringe-model-date directory. DEFAULT.')
     allgroup.add_argument('--single', dest='allFlag',
                           action='store_false',
                           help='Download only a single fringe model from the '
-                               '-fringe-model-date directory. Requires '
-                               'setting the -fringe-model-id argument.')
+                               '--fringe-model-date directory. Requires '
+                               'setting the --fringe-model-id argument.')
     parser.set_defaults(allFlag=True)
+
+    alliamges = parser.add_argument_group('arguments for --single')
+    alliamges.add_argument('--fringe-model-id', type=str, default=None,
+                           help='If --single is selected, only the fringe '
+                                'model containing the --fringe-model-id is'
+                                ' downloaded from the NERSC web portal. The '
+                                '--fringe-model-id is the cid and the qid of '
+                                'the fringe model combined in the following '
+                                'syntax: c01_q1')
 
     args = parser.parse_args()
 
@@ -85,13 +88,9 @@ def main():
         print('--fringe-model-id must be set if --single is selected')
         sys.exit(0)
 
-    if args.allFlag:
-        download_models(args.fringe_model_date,
-                        args.fringe_model_folder)
-    else:
-        download_models(args.fringe_model_date,
-                        args.fringe_model_folder,
-                        model_id=args.fringe_model_id)
+    download_models(args.fringe_model_date,
+                    args.fringe_model_folder,
+                    model_id=args.fringe_model_id)
 
 
 if __name__ == '__main__':

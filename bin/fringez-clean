@@ -40,20 +40,34 @@ def main():
     """Subtracts a saved fringe model from the provided science image."""
 
     # Get arguments
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    allArguments = parser.add_argument_group('arguments for '
-                                             '---all-images-in-folder')
-    allArguments.add_argument('--fringe-model-folder', type=str,
-                              help='Folder that contains all fringe models.')
 
-    notAllArguments = parser.add_argument_group('arguments for -single-image')
-    notAllArguments.add_argument('--image-name', type=str,
-                                 help='Filename of science image.')
-    notAllArguments.add_argument('--fringe-model-name', type=str,
-                                 help='Filename of fringe model.')
+    debug = parser.add_argument_group('debug')
+    plotgroup = debug.add_mutually_exclusive_group()
+    plotgroup.add_argument('--debug', dest='debugFlag',
+                           action='store_true',
+                           help='Do save fringe image to disk.')
+    plotgroup.add_argument('--debug-off', dest='debugFlag',
+                           action='store_false',
+                           help='Do NOT save fringe image to disk. DEFAULT.')
+    parser.set_defaults(debugFlag=False)
 
-    allgroup = parser.add_mutually_exclusive_group()
+    parallel = parser.add_argument_group('parallelization')
+    parallelgroup = parallel.add_mutually_exclusive_group()
+    parallelgroup.add_argument('--single', dest='parallelFlag',
+                               action='store_false',
+                               help='Run in single mode. DEFAULT.')
+    parallelgroup.add_argument('--parallel', dest='parallelFlag',
+                               action='store_true',
+                               help='Run in parallel mode. This is '
+                                    'recommended when selecting '
+                                    '--all-images-in-folder. Requires mpi4py.')
+    parser.set_defaults(parallelFlag=False)
+
+    allorsingle = parser.add_argument_group('all or single')
+    allgroup = allorsingle.add_mutually_exclusive_group()
     allgroup.add_argument('--all-images-in-folder', dest='allFlag',
                           action='store_true',
                           help='Clean all images in the current folder. '
@@ -66,25 +80,16 @@ def main():
                                '--image-name and --fringe-model-name.')
     parser.set_defaults(allFlag=True)
 
-    plotgroup = parser.add_mutually_exclusive_group()
-    plotgroup.add_argument('--debug', dest='debugFlag',
-                           action='store_true',
-                           help='Do save fringe image to disk.')
-    plotgroup.add_argument('--debug-off', dest='debugFlag',
-                           action='store_false',
-                           help='Do NOT save fringe image to disk. DEFAULT.')
-    parser.set_defaults(debugFlag=False)
+    allArguments = parser.add_argument_group('arguments for '
+                                             '--all-images-in-folder')
+    allArguments.add_argument('--fringe-model-folder', type=str,
+                              help='Folder that contains all fringe models.')
 
-    parallelgroup = parser.add_mutually_exclusive_group()
-    parallelgroup.add_argument('--single', dest='parallelFlag',
-                               action='store_false',
-                               help='Run in single mode. DEFAULT.')
-    parallelgroup.add_argument('--parallel', dest='parallelFlag',
-                               action='store_true',
-                               help='Run in parallel mode. This is '
-                                    'recommended when selecting '
-                                    '--all-images-in-folder. Requires mpi4py.')
-    parser.set_defaults(parallelFlag=False)
+    notAllArguments = parser.add_argument_group('arguments for --single-image')
+    notAllArguments.add_argument('--image-name', type=str,
+                                 help='Filename of science image.')
+    notAllArguments.add_argument('--fringe-model-name', type=str,
+                                 help='Filename of fringe model.')
 
     args = parser.parse_args()
 

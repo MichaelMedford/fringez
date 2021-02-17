@@ -17,30 +17,26 @@ def main():
     the directory. The model is saved to disk."""
 
     # Get arguments
-    parser = argparse.ArgumentParser(description=__doc__)
-
+    parser = argparse.ArgumentParser(description=__doc__,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     arguments = parser.add_argument_group('arguments')
     arguments.add_argument('--n-components', type=int,
                            default=6,
-                           help='Number of components in the PCA model. '
-                                'DEFAULT 6.', required=False)
+                           help='Number of components in the PCA model.')
     arguments.add_argument('--n-samples', type=int, default=None,
                            help='Number of samples for PCA training. '
                                 'If set to None the number of samples is equal to the '
                                 'number of images. If set to a number less than the '
                                 'number of images, images are collected into median '
                                 'stacks of approximately equal size and photometric depth '
-                                'prior to training. DEFAULT None.', required=False)
+                                'prior to training.')
     arguments.add_argument('--fringe-model-name', type=str,
                            default=None,
                            help='If selected, forces the generated fringe '
-                                'models to include this name. DEFAULT None.', required=False)
-    arguments.add_argument('--plot-idx', type=int,
-                           default=None,
-                           help='If selected, forces the example debug plot '
-                                'to a specific image in the folder. DEFAULT None.', required=False)
+                                'models to include this name')
 
-    plotgroup = parser.add_mutually_exclusive_group()
+    plotting = parser.add_argument_group('plotting')
+    plotgroup = plotting.add_mutually_exclusive_group()
     plotgroup.add_argument('--plots', dest='plotFlag',
                            action='store_true',
                            help='Turn ON plotting for debugging.')
@@ -49,7 +45,14 @@ def main():
                            help='Turn OFF plotting for debugging. DEFAULT.')
     parser.set_defaults(plotFlag=False)
 
-    parallelgroup = parser.add_mutually_exclusive_group()
+    plots = parser.add_argument_group('arguments for --plots')
+    plots.add_argument('--plot-idx', type=int,
+                           default=None,
+                           help='If selected, forces the example debug plot '
+                                'to a specific image in the folder')
+
+    parallel = parser.add_argument_group('parallelization')
+    parallelgroup = parallel.add_mutually_exclusive_group()
     parallelgroup.add_argument('--single', dest='parallelFlag',
                                action='store_false',
                                help='Run in single mode. DEFAULT.')
