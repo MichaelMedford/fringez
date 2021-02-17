@@ -57,7 +57,7 @@ def gather_fringe_maps(N_samples, parallelFlag):
 
     if rank == 0:
         # Only select images currently on disk
-        fringe_filename_arr = glob.glob('ztf*sciimg*fits')
+        fringe_filename_arr = glob.glob('*sciimg*fits')
         fringe_filename_arr.sort()
         maglimit_arr = []
         for fringe_filename in fringe_filename_arr:

@@ -115,7 +115,7 @@ def main():
         # Subtract the fringe model to all science images in the directory
         print('*** --all-images-in-folder selected, cleaning all images '
               'in the current directory')
-        image_names = glob.glob('ztf*sciimg.fits')
+        image_names = glob.glob('*sciimg.fits')
         image_names.sort()
 
         if args.parallelFlag:
