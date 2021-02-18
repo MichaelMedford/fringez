@@ -98,7 +98,7 @@ def generate_random_ds9_list(n_random=6):
     """ Generates a random list of images to be viewed in ds9
     Viewed with: ds9 -zscale $(<ds9.list) """
 
-    fname_arr = glob.glob('ztf*sciimg.clean.fits')
+    fname_arr = glob.glob('*sciimg.clean.fits')
     fname_arr.sort()
 
     n_images = min(n_random, len(fname_arr))

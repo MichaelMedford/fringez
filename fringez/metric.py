@@ -36,6 +36,8 @@ def load_image_and_mask(sciimg_fname, mskimg_fname):
         mask = f[0].data
     mask = mask.astype(bool)
 
+    return image, image_header, mask
+
 
 def return_aperture_locations(mask, N_apertures=50000, aperture_size=2,
                               edge_buffer=10, aperture_buffer_multiple=3):

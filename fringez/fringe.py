@@ -57,7 +57,7 @@ def gather_fringe_maps(N_samples, parallelFlag):
 
     if rank == 0:
         # Only select images currently on disk
-        fringe_filename_arr = glob.glob('ztf*sciimg*fits')
+        fringe_filename_arr = glob.glob('*sciimg.fits')
         fringe_filename_arr.sort()
         maglimit_arr = []
         for fringe_filename in fringe_filename_arr:
@@ -72,9 +72,12 @@ def gather_fringe_maps(N_samples, parallelFlag):
         fringe_filename_arr = fringe_filename_arr[maglimit_idxs]
 
         # Determine the rcid of the folder
-        ccdid = int(fringe_filename_arr[0].split('_')[-4].replace('c', ''))
-        qid = int(fringe_filename_arr[0].split('_')[-2].replace('q', ''))
-        rcid = (ccdid - 1) * 4 + (qid - 1)
+        try:
+            ccdid = int(fringe_filename_arr[0].split('_')[-4].replace('c', ''))
+            qid = int(fringe_filename_arr[0].split('_')[-2].replace('q', ''))
+            rcid = (ccdid - 1) * 4 + (qid - 1)
+        except IndexError:
+            rcid = 0
         print('rcid = %i' % rcid)
 
         # Determine the image_shape
@@ -163,7 +166,7 @@ def calculate_fringe_bias(fringe_map, fringe_model):
     transform and inverse transform methods.
 
     Models are loaded from disk as
-    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
+    fringez_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model """
 
     fringe_map = fringe_map.flatten()
     fringe_map_transposed = fringe_map.reshape(1, len(fringe_map))

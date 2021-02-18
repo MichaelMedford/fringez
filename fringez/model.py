@@ -64,7 +64,7 @@ def generate_models(fname_arr,
     of fringe maps.
 
     Models are saved to disk as
-    fringe_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model
+    fringez_{MODEL_NAME}_comp{N_COMPONENTS}.c{CID}_q{QID}.{DATE}.model
     """
 
     estimators = return_estimators(n_components=n_components)
@@ -76,14 +76,14 @@ def generate_models(fname_arr,
         qid = int(rcid % 4) + 1
 
         if fringe_model_name is None:
-            model_name = 'fringe_%s_comp%02d.' \
+            model_name = 'fringez_%s_comp%02d.' \
                          'c%02d_q%i.%s' % (name,
                                            n_components,
                                            cid,
                                            qid,
                                            timestamp)
         else:
-            model_name = 'fringe_%s_comp%02d.' \
+            model_name = 'fringez_%s_comp%02d.' \
                          'c%02d_q%i.%s.%s' % (name,
                                               n_components,
                                               cid,
@@ -149,14 +149,14 @@ def test_models(fringe_maps_flattened,
         qid = int(rcid % 4) + 1
 
         if fringe_model_name is None:
-            model_name = 'fringe_%s_comp%02d.' \
+            model_name = 'fringez_%s_comp%02d.' \
                          'c%02d_q%i.%s.model' % (name,
                                                  n_components,
                                                  cid,
                                                  qid,
                                                  timestamp)
         else:
-            model_name = 'fringe_%s_comp%02d.' \
+            model_name = 'fringez_%s_comp%02d.' \
                          'c%02d_q%i.%s.%s.model' % (name,
                                                     n_components,
                                                     cid,
