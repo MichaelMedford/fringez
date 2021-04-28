@@ -157,7 +157,7 @@ def append_eigenvalues_to_header(header, fringe_ica):
     return header
 
 
-def calculate_fringe_bias(fringe_map, fringe_model):
+def calculate_fringe_bias(fringe_map, median_absdev, fringe_model):
     """ Generates fringe bias image for the provided science image.
     These formulas are taken from the scikit-learn estimator's
     transform and inverse transform methods.
@@ -172,15 +172,15 @@ def calculate_fringe_bias(fringe_map, fringe_model):
     components = fringe_model['components']
     explained_variance = fringe_model['explained_variance']
 
-    fringe_map_transposed = fringe_map_transposed - mean
-    fringe_ica = np.dot(fringe_map_transposed, components.T)
-    fringe_ica /= np.sqrt(explained_variance)
+    fringe_map_centered = fringe_map_transposed - mean
+    fringe_proj = np.dot(fringe_map_centered, components.T)
+    fringe_proj /= np.sqrt(explained_variance)
 
-    fringe_bias = np.dot(fringe_ica, np.sqrt(
-        explained_variance[:, np.newaxis]) * components) + mean
+    fringe_bias = np.dot(fringe_proj, np.sqrt(explained_variance[:, np.newaxis]) * components) + mean
+    fringe_bias *= median_absdev
     fringe_bias = fringe_bias.astype(fringe_map.dtype)
 
-    return fringe_bias, fringe_ica
+    return fringe_bias, fringe_proj
 
 
 def remove_fringe(image_name,
@@ -210,11 +210,10 @@ def remove_fringe(image_name,
 
     fringe_model = np.load(fringe_model_name)
 
-    fringe_bias, fringe_ica = calculate_fringe_bias(fringe_map, fringe_model)
+    fringe_bias, fringe_proj = calculate_fringe_bias(fringe_map, median_absdev, fringe_model)
     fringe_bias = fringe_bias.reshape(image.shape)
-    fringe_bias *= median_absdev
 
-    header = append_eigenvalues_to_header(header, fringe_ica)
+    header = append_eigenvalues_to_header(header, fringe_proj)
     header['FRNGMDL'] = os.path.basename(fringe_model_name)
 
     image_clean = image - fringe_bias
