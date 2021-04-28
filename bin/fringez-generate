@@ -8,7 +8,6 @@ the directory. The model is saved to disk.
 """
 import argparse
 from fringez.model import generate_models
-from fringez.model import test_models
 from fringez.fringe import gather_flat_fringe_maps
 
 
@@ -34,16 +33,6 @@ def main():
                            default=None,
                            help='If selected, forces the generated fringe '
                                 'models to include this name')
-
-    plotting = parser.add_argument_group('plotting')
-    plotgroup = plotting.add_mutually_exclusive_group()
-    plotgroup.add_argument('--plots', dest='plotFlag',
-                           action='store_true',
-                           help='Turn ON plotting for debugging.')
-    plotgroup.add_argument('--plots-off', dest='plotFlag',
-                           action='store_false',
-                           help='Turn OFF plotting for debugging. DEFAULT.')
-    parser.set_defaults(plotFlag=False)
 
     plots = parser.add_argument_group('arguments for --plots')
     plots.add_argument('--plot-idx', type=int,
@@ -90,15 +79,6 @@ def main():
                     fringe_model_name=args.fringe_model_name,
                     n_components=args.n_components,
                     plotFlag=args.plotFlag)
-
-    if args.plotFlag:
-        # Apply the fringe model to a random image for testing
-        test_models(fringe_maps_flattened,
-                    image_shape,
-                    rcid,
-                    fringe_model_name=args.fringe_model_name,
-                    n_components=args.n_components,
-                    idx=args.plot_idx)
 
 
 if __name__ == '__main__':
