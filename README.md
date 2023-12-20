@@ -1,5 +1,7 @@
 # fringez
 
+![](https://github.com/MichaelMedford/fringez/raw/master/figures/fringez_logo.png)
+
 ## Getting Started
 
 ZTF i-band images are contaminated with atmospheric fringes that significantly 
