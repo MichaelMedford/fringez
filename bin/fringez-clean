@@ -10,31 +10,9 @@ import glob
 import subprocess
 import sys
 from fringez.fringe import remove_fringe
-
-
-def return_model_template(fringe_model_folder):
-    model = glob.glob(fringe_model_folder + '/fringe*model')[0]
-    model_prefix = model.split('.')[0]
-    model_suffix = '.'.join(model.split('.')[-2:])
-    return model_prefix, model_suffix
-
-
-def return_image_cid_qid(image):
-    cid = image.split('_')[4]
-    qid = image.split('_')[6]
-    return cid, qid
-
-
-def return_fringe_model_name(image, fringe_model_folder):
-    model_prefix, model_suffix = return_model_template(fringe_model_folder)
-    cid, qid = return_image_cid_qid(image)
-
-    fringe_model = model_prefix
-    fringe_model += '.%s_%s.' % (cid, qid)
-    fringe_model += model_suffix
-
-    return fringe_model
-
+from fringez.utils import return_model_template, 
+                          return_image_cid_qid, 
+                          return_fringe_model_name
 
 def main():
     """Subtracts a saved fringe model from the provided science image."""
