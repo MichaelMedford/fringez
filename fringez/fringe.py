@@ -183,9 +183,10 @@ def calculate_fringe_bias(fringe_map, median_absdev, fringe_model):
     return fringe_bias, fringe_proj
 
 
-def remove_fringe(image_name,
+def remove_fringe_and_save(image_name,
                   fringe_model_name,
-                  debugFlag=False):
+                  debugFlag=False,
+                  mask=None):
     """ Subtracts the fringe bias image from the science image, resulting in
     a clean image with extension *sciimg.clean.fits.
 
@@ -206,17 +207,12 @@ def remove_fringe(image_name,
         image = f[0].data
         header = f[0].header
 
-    fringe_map, median_absdev = generate_fringe_map(image)
-
-    fringe_model = np.load(fringe_model_name)
-
-    fringe_bias, fringe_proj = calculate_fringe_bias(fringe_map, median_absdev, fringe_model)
-    fringe_bias = fringe_bias.reshape(image.shape)
+    image_clean, fringe_bias, fringe_proj = remove_fringe(image, fringe_model_name, 
+                                                          mask=mask)
 
     header = append_eigenvalues_to_header(header, fringe_proj)
     header['FRNGMDL'] = os.path.basename(fringe_model_name)
 
-    image_clean = image - fringe_bias
     image_clean_fname = image_name.replace('.fits', '.clean.fits')
     create_fits(image_clean_fname, image_clean, header)
     print('-- %s saved to disk' % image_clean_fname)
@@ -228,3 +224,19 @@ def remove_fringe(image_name,
         create_fits(fname, fringe_bias, header)
 
         print('-- %s saved to disk' % fname)
+
+def remove_fringe(image, fringe_model_name, mask=None):
+    """
+    Mid-Level function of fringe removal.
+    """
+    
+    fringe_map, median_absdev = generate_fringe_map(image, mask_image=mask)
+
+    fringe_model = np.load(fringe_model_name)
+
+    fringe_bias, fringe_proj = calculate_fringe_bias(fringe_map, median_absdev, fringe_model)
+    fringe_bias = fringe_bias.reshape(image.shape)
+
+    image_clean = image - fringe_bias
+
+    return image_clean, fringe_bias, fringe_proj
