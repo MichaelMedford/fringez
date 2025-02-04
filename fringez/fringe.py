@@ -5,8 +5,7 @@ import numpy as np
 import sys
 import os
 import glob
-from fringez.utils import create_fits
-from fringez.utils import flatten_images
+from fringez.utils import create_fits, flatten_images
 
 
 def generate_fringe_map(image, mask_image=None):
@@ -229,7 +228,7 @@ def remove_fringe(image, fringe_model_name, mask=None):
     """
     Mid-Level function of fringe removal.
     """
-    
+
     fringe_map, median_absdev = generate_fringe_map(image, mask_image=mask)
 
     fringe_model = np.load(fringe_model_name)

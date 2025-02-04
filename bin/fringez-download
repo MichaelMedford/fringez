@@ -8,9 +8,6 @@ Download pre-generated fringe models from the NERSC web portal.
 import os
 import sys
 import argparse
-import requests
-import wget
-from bs4 import BeautifulSoup
 from fringe.utils import download_models
 
 def main():
