@@ -10,9 +10,9 @@ import glob
 import subprocess
 import sys
 from fringez.fringe import remove_fringe
-from fringez.utils import return_model_template, 
+from fringez.utils import (return_model_template, 
                           return_image_cid_qid, 
-                          return_fringe_model_name
+                          return_fringe_model_name)
 
 def main():
     """Subtracts a saved fringe model from the provided science image."""
