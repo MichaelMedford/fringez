@@ -5,7 +5,9 @@ import glob
 import os
 import shutil
 from astropy.io import fits
-import shutil
+import requests
+import wget
+from bs4 import BeautifulSoup
 
 
 NERSC_url = 'https://portal.nersc.gov/project/ptf/' \
