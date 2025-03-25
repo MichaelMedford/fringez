@@ -4,8 +4,8 @@ metric.py
 """
 
 from astropy.io import fits
-from photutils import MedianBackground, StdBackgroundRMS
-from photutils import aperture_photometry, CircularAperture
+from photutils import (MedianBackground, StdBackgroundRMS,
+                        aperture_photometry, CircularAperture)
 from photutils.background import Background2D
 import numpy as np
 import os

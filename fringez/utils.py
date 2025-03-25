@@ -5,7 +5,13 @@ import glob
 import os
 import shutil
 from astropy.io import fits
-import shutil
+import requests
+import wget
+from bs4 import BeautifulSoup
+
+
+NERSC_url = 'https://portal.nersc.gov/project/ptf/' \
+            'iband/ztf_iband_fringe_models_'
 
 
 def flatten_images(images):
@@ -109,3 +115,49 @@ def generate_random_ds9_list(n_random=6):
         for idx in idx_arr:
             f.write('%s\n' % fname_arr[idx])
             f.write('%s\n' % fname_arr[idx].replace('.clean', ''))
+
+def return_model_template(fringe_model_folder):
+    model = glob.glob(fringe_model_folder + '/fringe*model')[0]
+    model_prefix = model.split('.')[0]
+    model_suffix = '.'.join(model.split('.')[-2:])
+    return model_prefix, model_suffix
+
+
+def return_image_cid_qid(image):
+    cid = image.split('_')[4]
+    qid = image.split('_')[6]
+    return cid, qid
+
+
+def return_fringe_model_name(image, fringe_model_folder):
+    model_prefix, model_suffix = return_model_template(fringe_model_folder)
+    cid, qid = return_image_cid_qid(image)
+
+    fringe_model = model_prefix
+    fringe_model += '.%s_%s.' % (cid, qid)
+    fringe_model += model_suffix
+
+    return fringe_model
+
+def download_models(model_date, fringe_model_dir, model_id=None):
+    source_code = requests.get(NERSC_url + model_date)
+    plain_text = source_code.text
+    soup = BeautifulSoup(plain_text, "html.parser")
+
+    outdir = fringe_model_dir + '/' + model_date
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
+
+    if model_id:
+        print('Downloading model and model lists %s to %s' % (model_id,
+                                                              outdir))
+    else:
+        print('Downloading all models and model lists to %s' % outdir)
+
+    for link in soup.findAll('a'):
+        href = link.get('href')
+        if 'model' not in href:
+            continue
+        if model_id and model_id not in href:
+            continue
+        wget.download(NERSC_url + model_date + '/' + href, out=outdir)
